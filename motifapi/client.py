@@ -96,6 +96,7 @@ class Motif(object):
            'camera/(?P<serial>[^\s /]+)$': 'GET',
            'camera/(?P<serial>[^\s /]+)/configure$': 'PATCH',
            'camera/(?P<serial>[^\s /]+)/recording/start$': 'POST',
+           'camera/(?P<serial>[^\s /]+)/recording/stop$': 'POST',
            'recording/start$': 'POST',
            'recording/stop$': 'POST',
     }
