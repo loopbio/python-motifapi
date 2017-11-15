@@ -97,8 +97,10 @@ class Motif(object):
            'camera/(?P<serial>[^\s /]+)/configure$': 'PATCH',
            'camera/(?P<serial>[^\s /]+)/recording/start$': 'POST',
            'camera/(?P<serial>[^\s /]+)/recording/stop$': 'POST',
+           'camera/(?P<serial>[^\s /]+)/recordings$': 'GET',
            'recording/start$': 'POST',
            'recording/stop$': 'POST',
+           'recordings$': 'GET',
     }
 
     def __init__(self, host, api_key, port=6083, ca_cert=None):
