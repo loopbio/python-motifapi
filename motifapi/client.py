@@ -167,5 +167,6 @@ class Motif(object):
         req = self._build_request(endpoint,
                                   data=kwargs or None,
                                   method=meth)
-        return self._call(req)
+        out = self._call(req)
+        return json.loads(out)
 
