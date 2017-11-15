@@ -168,5 +168,11 @@ class Motif(object):
                                   data=kwargs or None,
                                   method=meth)
         out = self._call(req)
-        return json.loads(out)
+        if out:
+            try:
+                return json.loads(out)
+            except ValueError as e:
+                raise ValueError('Invalid JSON response: %s' % e.message)
+        else:
+            return {}
 
