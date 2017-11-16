@@ -11,6 +11,7 @@ setup(
     author='John Stowers',
     author_email='john@loopbio.com',
     packages=['motifapi'],
+    install_requires=['six'],
     include_package_data=True,
 )
 
