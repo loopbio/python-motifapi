@@ -5,6 +5,7 @@ import ssl
 import socket
 import os.path
 import subprocess
+import logging
 
 from six.moves import urllib, http_client
 
@@ -107,7 +108,7 @@ class Motif(object):
            'recordings/export_all$': 'POST',
     }
 
-    def __init__(self, host, api_key, port=6083, ca_cert=None):
+    def __init__(self, host, api_key, port=6083, ca_cert=None, api_version=1):
         if (host is None) and (api_key is None):
             host = '127.0.0.1'
             try:
@@ -120,6 +121,8 @@ class Motif(object):
 
         if not os.path.exists(ca_cert):
             raise ValueError('could not find certificate: %s' % ca_cert)
+
+        self._prefix = 'api/%d/' % api_version
 
         client_cert_key = None
         client_cert_pem = None #file path 
@@ -134,14 +137,26 @@ class Motif(object):
         self._api_key = api_key
         self._port = port
 
+        self._log = logging.getLogger('motifapi')
+
     def _build_request(self, endpoint, data=None, method='GET'):
         if endpoint[0] == '/':
             endpoint = endpoint[1:]
+
+        if endpoint != 'version':
+            endpoint = self._prefix + endpoint
+
         if data is not None:
             data = json.dumps(data)
-        req = MethodRequest('https://%s:%s/%s' % (self._host, self._port, endpoint), data, method=method)
+
+        url = 'https://%s:%s/%s' % (self._host, self._port, endpoint)
+
+        req = MethodRequest(url, data, method=method)
         req.add_header('X-Api-Key', self._api_key)
         req.add_header('Content-Type', 'application/json')
+
+        self._log.debug('%s %s' % (method, url))
+
         return req
 
     def _call(self, req):
