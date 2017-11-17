@@ -183,7 +183,7 @@ class Motif(object):
                 break
 
         if meth is None:
-            raise ValueError('unknown endpoint')
+            raise ValueError("unknown endpoint '%s' (are you missing/adding '/')" % endpoint)
 
         req = self._build_request(endpoint,
                                   data=kwargs or None,
