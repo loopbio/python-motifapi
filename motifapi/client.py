@@ -106,6 +106,16 @@ class Motif(object):
            'recordings$': 'GET',
            'recordings/copy_all$': 'POST',
            'recordings/export_all$': 'POST',
+           'schedule$': 'GET',
+           'schedule/clear$': 'POST',
+           'schedule/clear$': 'POST',
+           'schedule/(?P<identifier>[^\s /]+)/clear$': 'DELETE',
+           'schedule/recording/start$': 'POST',
+           'schedule/camera/(?P<serial>[^\s /]+)/recording/start$': 'POST',
+           'schedule/recordings/copy_all': 'POST',
+           'schedule/camera/(?P<serial>[^\s /]+)/recordings/copy_all$': 'POST',
+           'schedule/recordings/export_all': 'POST',
+           'schedule/camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
     }
 
     def __init__(self, host, api_key, port=6083, ca_cert=None, api_version=1):
