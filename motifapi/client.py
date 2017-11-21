@@ -147,7 +147,10 @@ class Motif(object):
             endpoint = self._prefix + endpoint
 
         if data is not None:
-            data = json.dumps(data)
+            try:
+                data = json.dumps(data)
+            except TypeError:
+                raise ValueError('Arguments must be JSON serializable (they were %r)' % (data,))
 
         url = 'https://%s:%s/%s' % (self._host, self._port, endpoint)
 
