@@ -25,13 +25,13 @@ Set up the connection to the machine
 
 ```python
 
-from motifapi import Motif
+from motifapi import MotifApi
 
 
 IP_ADDRESS = '10.11.12.23'
 API_KEY = 'abcdef123456abcdef123456abcdef12'
 
-api = Motif(IP_ADDRESS, API_KEY)
+api = MotifApi(IP_ADDRESS, API_KEY)
 # check the client is connected
 api.call('version')
 ```
@@ -71,5 +71,34 @@ To find the status of a camera (is it recording, uploading, etc) do
 
 ```python
 api.call('camera/FAKE0')
+```
+
+**See `examples/*.py` for further examples of API usage**
+
+Scheduling
+----------
+
+The API also supports defining scheduled tasks, this allows for example, to schedule recordings
+and their subsequent copy to storage to occur at specific times.
+
+Task scheduling re-uses [Cron syntax]() with some extensions. Specifically it utilises
+the [Cronex](https://github.com/ericpruitt/cronex/blob/057509738a86ea70bddbfe853736fa4ef6f67f3b/README.md) library
+and supports the formats mentioned there (including monotonic tasks with `%` markup). All times are
+in local-time of the machine running the recording software.
+
+To list currently scheduled tasks (and the current machine time)
+
+```python
+print(api.call('schedule'))
+```
+
+The API for scheduling tasks is very similar to that of other tasks - API endpoints are
+prefixed with `schedule/VERB` and require passing two compulsory additional parameters,
+`task_name` and `cron_expression`. For example, to schedule a 30 minute recording as configured above
+to be executed every-hour-on-the-hour between 9am and 4pm, make the following API call
+
+```python
+api.call('schedule/recording/start', task_name='record_video', cron_expression='0 06-16 * * *',
+                                     codec='low', duration=30*60)
 ```
 
