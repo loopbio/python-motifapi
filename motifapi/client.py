@@ -212,7 +212,11 @@ class Motif(object):
 
     def is_recording(self, serial):
         r = self.call('camera/%s' % serial)
-        return True if r['camera_info'].get('filename') else False
+        if r['camera_info'].get('filename'):
+            return True
+        elif r['camera_info'].get('status') == 'pending':
+            return True
+        return False
 
     def is_copying(self, serial):
         r = self.call('camera/%s' % serial)
