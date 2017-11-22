@@ -1,5 +1,5 @@
 from __future__ import print_function
-from motifapi import Motif
+from motifapi import MotifApi
 
 if __name__ == "__main__":
     import argparse
@@ -14,6 +14,6 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO)
 
-    api = Motif(args.ip, args.api_key)
+    api = MotifApi(args.ip, args.api_key)
     print("version: %r" % (api.call('version'),))
 

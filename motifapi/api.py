@@ -83,13 +83,13 @@ class MethodRequest(urllib.request.Request):
         return self._method if self._method is not None else urllib.request.Request.get_method(self, *args, **kwargs)
 
 
-class APIError(Exception):
+class MotifApiError(Exception):
     def __init__(self, message, code):
         self.code = code
         Exception.__init__(self, message)
 
 
-class Motif(object):
+class MotifApi(object):
 
     API = {'version$': 'GET',
            'cameras$': 'GET',
@@ -182,7 +182,7 @@ class Motif(object):
             try:
                 raw = e.read()
                 err = json.loads(raw)
-                exc = APIError(err['error'], err['status_code'])
+                exc = MotifApiError(err['error'], err['status_code'])
             except Exception:
                 raise ValueError('unknown API error')
             raise exc

@@ -1,1 +1,1 @@
-from .client import APIError, Motif
+from .api import MotifApiError, MotifApi

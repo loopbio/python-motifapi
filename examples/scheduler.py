@@ -2,13 +2,13 @@ from __future__ import print_function
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-from motifapi import Motif
+from motifapi import MotifApi
 
 # You need to fill these out
 IP_ADDRESS = None
 API_KEY = None
 
-api = Motif(IP_ADDRESS, API_KEY)
+api = MotifApi(IP_ADDRESS, API_KEY)
 
 camera_serial = 'FAKE0'
 

@@ -1,15 +1,15 @@
 from __future__ import print_function
 import time
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
-from motifapi import Motif
+from motifapi import MotifApi
 
 # You need to fill these out
 IP_ADDRESS = None
 API_KEY = None
 
-api = Motif(IP_ADDRESS, API_KEY)
+api = MotifApi(IP_ADDRESS, API_KEY)
 
 # get serial number of first connected camera
 camsn = api.call('cameras')['cameras'][0]['serial']
