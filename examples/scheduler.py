@@ -1,15 +1,12 @@
 from __future__ import print_function
-
-import time
-import tempfile
 import logging
+logging.basicConfig(level=logging.DEBUG)
 
 from motifapi import Motif
 
-logging.basicConfig(level=logging.DEBUG)
-
-IP_ADDRESS = '10.11.12.13'
-API_KEY = 'abcdef123456abcdef123456abcdef12'
+# You need to fill these out
+IP_ADDRESS = None
+API_KEY = None
 
 api = Motif(IP_ADDRESS, API_KEY)
 
