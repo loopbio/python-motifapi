@@ -102,3 +102,4 @@ api.call('schedule/recording/start', task_name='record_video', cron_expression='
                                      codec='low', duration=30*60)
 ```
 
+**See examples/scheduler.py for more information**
