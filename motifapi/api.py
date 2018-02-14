@@ -158,7 +158,7 @@ class MotifApi(object):
 
         if data is not None:
             try:
-                data = json.dumps(data)
+                data = json.dumps(data).encode("utf-8")
             except TypeError:
                 raise ValueError('Arguments must be JSON serializable (they were %r)' % (data,))
 
@@ -184,7 +184,7 @@ class MotifApi(object):
         except urllib.error.HTTPError as e:
             try:
                 raw = e.read()
-                err = json.loads(raw)
+                err = json.loads(raw.decode('utf-8'))
                 exc = MotifApiError(err['error'], err['status_code'])
             except Exception:
                 raise ValueError('unknown API error')
@@ -207,7 +207,7 @@ class MotifApi(object):
         out = self._call(req)
         if out:
             try:
-                return json.loads(out)
+                return json.loads(out.decode('utf-8'))
             except ValueError as e:
                 raise ValueError('Invalid JSON response: %s' % e.message)
         else:
