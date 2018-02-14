@@ -168,7 +168,10 @@ class MotifApi(object):
         req.add_header('X-Api-Key', self._api_key)
         req.add_header('Content-Type', 'application/json')
 
-        self._log.debug('%s %s' % (method, url))
+        self._log.debug('%s %s (%d bytes %s)' % (method,
+                                                 url,
+                                                 0 if data is None else len(data),
+                                                 type(data)))
 
         return req
 
