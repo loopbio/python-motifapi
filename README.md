@@ -84,7 +84,8 @@ and their subsequent copy to storage to occur at specific times.
 Task scheduling re-uses [Cron syntax]() with some extensions. Specifically it utilises
 the [Cronex](https://github.com/ericpruitt/cronex/blob/057509738a86ea70bddbfe853736fa4ef6f67f3b/README.md) library
 and supports the formats mentioned there (including monotonic tasks with `%` markup). All times are
-in local-time of the machine running the recording software.
+in local-time of the machine running the recording software. We recommend using the
+[corntab](http://corntab.com/) website to validate your cron expressions.
 
 To list currently scheduled tasks (and the current machine time)
 
