@@ -9,16 +9,18 @@ import logging
 
 from six.moves import urllib, http_client
 
-DEFAULT_HTTP_TIMEOUT = 10 #seconds
+DEFAULT_HTTP_TIMEOUT = 10  # seconds
+
 
 # http://code.activestate.com/recipes/577548-https-httplib-client-connection-with-certificate-v/
 # http://stackoverflow.com/questions/1875052/using-paired-certificates-with-urllib2
 
 class HTTPSClientAuthHandler(urllib.request.HTTPSHandler):
-    '''
+    """
     Allows sending a client certificate with the HTTPS connection.
     This version also validates the peer (server) certificate since, well...
-    '''
+    """
+
     def __init__(self, key=None, cert=None, ca_certs=None, ssl_version=None):
         urllib.request.HTTPSHandler.__init__(self)
         self.key = key
@@ -33,44 +35,46 @@ class HTTPSClientAuthHandler(urllib.request.HTTPSHandler):
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout=DEFAULT_HTTP_TIMEOUT):
-        return HTTPSConnection( host, 
-                key_file = self.key, 
-                cert_file = self.cert,
-                timeout = timeout,
-                ca_certs = self.ca_certs, 
-                ssl_version = self.ssl_version )
+        return HTTPSConnection(host,
+                               key_file=self.key,
+                               cert_file=self.cert,
+                               timeout=timeout,
+                               ca_certs=self.ca_certs,
+                               ssl_version=self.ssl_version)
 
 
 class HTTPSConnection(http_client.HTTPSConnection):
-    '''
+    """
     Overridden to allow peer certificate validation, configuration
     of SSL/ TLS version.  See:
     http://hg.python.org/cpython/file/c1c45755397b/Lib/httplib.py#l1144
     and `ssl.wrap_socket()`
-    '''
-    def __init__(self, host, **kwargs):
-        self.ca_certs = kwargs.pop('ca_certs',None)
-        self.ssl_version = kwargs.pop('ssl_version',ssl.PROTOCOL_SSLv23)
+    """
 
-        http_client.HTTPSConnection.__init__(self,host,**kwargs)
+    def __init__(self, host, **kwargs):
+        self.ca_certs = kwargs.pop('ca_certs', None)
+        self.ssl_version = kwargs.pop('ssl_version', ssl.PROTOCOL_SSLv23)
+
+        http_client.HTTPSConnection.__init__(self, host, **kwargs)
 
     def connect(self):
-        sock = socket.create_connection( (self.host, self.port), self.timeout )
+        sock = socket.create_connection((self.host, self.port), self.timeout)
 
         if self._tunnel_host:
             self.sock = sock
             self._tunnel()
 
-        self.sock = ssl.wrap_socket( sock, 
-                keyfile = self.key_file, 
-                certfile = self.cert_file,
-                ca_certs = self.ca_certs,
-                cert_reqs = ssl.CERT_REQUIRED if self.ca_certs else ssl.CERT_NONE,
-                ssl_version = self.ssl_version )
+        self.sock = ssl.wrap_socket(sock,
+                                    keyfile=self.key_file,
+                                    certfile=self.cert_file,
+                                    ca_certs=self.ca_certs,
+                                    cert_reqs=ssl.CERT_REQUIRED if self.ca_certs else ssl.CERT_NONE,
+                                    ssl_version=self.ssl_version)
 
 
 class MethodRequest(urllib.request.Request):
-    'See: https://gist.github.com/logic/2715756'
+    # See: https://gist.github.com/logic/2715756
+
     def __init__(self, *args, **kwargs):
         if 'method' in kwargs:
             self._method = kwargs['method']
@@ -90,7 +94,6 @@ class MotifApiError(Exception):
 
 
 class MotifApi(object):
-
     API = {'version$': 'GET',
            'cameras$': 'GET',
            'cameras/configure$': 'PATCH',
@@ -117,7 +120,7 @@ class MotifApi(object):
            'schedule/recordings/export_all': 'POST',
            'schedule/camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
            'io/(?P<serial>[^\s /]+)/(?P<channel>[^\s /]+)/set': 'POST'
-    }
+           }
 
     def __init__(self, host, api_key, port=6083, ca_cert=None, api_version=1):
         if (host is None) and (api_key is None):
@@ -136,12 +139,12 @@ class MotifApi(object):
         self._prefix = 'api/%d/' % api_version
 
         client_cert_key = None
-        client_cert_pem = None #file path 
-        handler = HTTPSClientAuthHandler( 
-            key = client_cert_key,
-            cert = client_cert_pem,
-            ca_certs = ca_cert,
-            ssl_version = ssl.PROTOCOL_SSLv23)
+        client_cert_pem = None  # file path
+        handler = HTTPSClientAuthHandler(
+            key=client_cert_key,
+            cert=client_cert_pem,
+            ca_certs=ca_cert,
+            ssl_version=ssl.PROTOCOL_SSLv23)
         self._http = urllib.request.build_opener(handler)
 
         self._host = host
@@ -230,4 +233,3 @@ class MotifApi(object):
         r = self.call('camera/%s' % serial)
         status = r['playback_info']['status']
         return status.startswith('export') and ('finished' not in status)
-
