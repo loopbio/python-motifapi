@@ -116,6 +116,7 @@ class MotifApi(object):
            'schedule/camera/(?P<serial>[^\s /]+)/recordings/copy_all$': 'POST',
            'schedule/recordings/export_all': 'POST',
            'schedule/camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
+           'io/(?P<serial>[^\s /]+)/(?P<channel>[^\s /]+)/set': 'POST'
     }
 
     def __init__(self, host, api_key, port=6083, ca_cert=None, api_version=1):
