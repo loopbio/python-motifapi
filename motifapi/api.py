@@ -87,13 +87,21 @@ class MethodRequest(urllib.request.Request):
         return self._method if self._method is not None else urllib.request.Request.get_method(self, *args, **kwargs)
 
 
-class MotifApiError(Exception):
+class MotifError(Exception):
+    pass
+
+
+class MotifApiError(MotifError):
     def __init__(self, message, code):
         self.code = code
         Exception.__init__(self, message)
 
 
 class MotifApi(object):
+
+    STREAM_TYPE_IMAGE = 1
+    STREAM_TYPE_STATE = 2
+
     API = {'version$': 'GET',
            'cameras$': 'GET',
            'cameras/configure$': 'PATCH',
@@ -233,3 +241,30 @@ class MotifApi(object):
         r = self.call('camera/%s' % serial)
         status = r['playback_info']['status']
         return status.startswith('export') and ('finished' not in status)
+
+    def get_stream(self, serial=None, stream_type=STREAM_TYPE_IMAGE):
+        from .stream import ImageStreamer
+
+        if serial is None:
+            try:
+                # get the first camera
+                for c in self.call('cameras').get('cameras', []):
+                    serial = c['serial']
+                    break
+            except (urllib.error.URLError, MotifApiError):
+                raise MotifError('motif not running or reachable')
+
+        if serial is None:
+            raise MotifError('no cameras connected or running')
+
+        if stream_type == MotifApi.STREAM_TYPE_IMAGE:
+            try:
+                stat = self.call('camera/%s' % serial)
+                host = '127.0.0.1'
+                port = int(stat['camera_info']['stream']['image']['port'])
+                return ImageStreamer(host, port)
+            except (urllib.error.URLError, MotifApiError):
+                raise MotifError('camera with serial %s not found or running' % serial)
+            except KeyError:
+                raise MotifError('realtime stream not enabled on camera')
+
