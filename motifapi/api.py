@@ -243,7 +243,7 @@ class MotifApi(object):
         return status.startswith('export') and ('finished' not in status)
 
     def get_stream(self, serial=None, stream_type=STREAM_TYPE_IMAGE):
-        from .stream import ImageStreamer
+        from .stream import ImageStreamer, StateStreamer
 
         if serial is None:
             try:
@@ -257,14 +257,27 @@ class MotifApi(object):
         if serial is None:
             raise MotifError('no cameras connected or running')
 
-        if stream_type == MotifApi.STREAM_TYPE_IMAGE:
+        def _get_host_port(_stream_name):
+            _stat = self.call('camera/%s' % serial)
+            _host = _stat['camera_info']['stream'][_stream_name]['host']
+            _port = int(_stat['camera_info']['stream'][_stream_name]['port'])
+            return _host, _port
+
+
+        if stream_type in (MotifApi.STREAM_TYPE_IMAGE, MotifApi.STREAM_TYPE_STATE):
             try:
-                stat = self.call('camera/%s' % serial)
-                host = '127.0.0.1'
-                port = int(stat['camera_info']['stream']['image']['port'])
-                return ImageStreamer(host, port)
+                if stream_type == MotifApi.STREAM_TYPE_IMAGE:
+                    host, port = _get_host_port('image')
+                    return ImageStreamer(host, port)
+                else:
+                    host, port = _get_host_port('state')
+                    return StateStreamer(host, port)
             except (urllib.error.URLError, MotifApiError):
                 raise MotifError('camera with serial %s not found or running' % serial)
             except KeyError:
                 raise MotifError('realtime stream not enabled on camera')
+        else:
+            raise ValueError('unknown stream type')
+
+
 

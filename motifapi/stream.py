@@ -1,3 +1,5 @@
+import json
+
 import zmq
 import numpy as np
 
@@ -27,4 +29,21 @@ class ImageStreamer(object):
                 return recv_array(self.stream)
             if not block:
                 return None, None
+
+
+class StateStreamer(object):
+
+    def __init__(self, host, port, channel='j'):
+        ctx = zmq.Context()
+        address = "tcp://%s:%d" % (host, port)
+        sock = ctx.socket(zmq.SUB)
+        sock.connect(address)
+        sock.setsockopt(zmq.LINGER, 0)
+        sock.setsockopt(zmq.SUBSCRIBE, channel)
+        self.stream = sock
+
+    def get_next_state(self, block=True):
+        while True:
+            _, msg = self.stream.recv_multipart()
+            return json.loads(msg)
 
