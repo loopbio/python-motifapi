@@ -1,8 +1,7 @@
 import time
 import pprint
-import urllib2
 
-from motifapi import MotifApi, MotifApiError
+from motifapi import MotifApi, MotifError
 api = MotifApi(None, None)
 
 while 1:
@@ -10,11 +9,7 @@ while 1:
         resp = api.call('cameras')
         for c in resp.get('cameras'):
             pprint.pprint(api.call('camera/%s' % c['serial']))
-    except urllib2.URLError:
-        # not running
-        pass
-    except MotifApiError:
-        # camera starting/stopping/race
+    except MotifError:
         pass
     time.sleep(2)
 

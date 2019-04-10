@@ -201,6 +201,8 @@ class MotifApi(object):
             except Exception:
                 raise ValueError('unknown API error')
             raise exc
+        except urllib.error.URLError:
+            raise MotifError('motif not running or reachable')
 
     def call(self, endpoint, method=None, data=None, **kwargs):
         meth = ep = None
