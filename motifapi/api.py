@@ -112,6 +112,7 @@ class MotifApi(object):
            'camera/(?P<serial>[^\s /]+)/recordings$': 'GET',
            'camera/(?P<serial>[^\s /]+)/recordings/copy_all$': 'POST',
            'camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
+           'camera/(?P<serial>[^\s /]+)/io/(?P<name>[^\s /]+)/set': 'POST',
            'recording/start$': 'POST',
            'recording/stop$': 'POST',
            'recordings$': 'GET',
@@ -127,7 +128,7 @@ class MotifApi(object):
            'schedule/camera/(?P<serial>[^\s /]+)/recordings/copy_all$': 'POST',
            'schedule/recordings/export_all': 'POST',
            'schedule/camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
-           'io/(?P<serial>[^\s /]+)/(?P<channel>[^\s /]+)/set': 'POST',
+           'io/(?P<io_serial>[^\s /]+)/(?P<io_port>[^\s /]+)/set': 'POST',
            'io/(?P<name>[^\s /]+)/set': 'POST',
            }
 
