@@ -133,12 +133,27 @@ class MotifApi(object):
            }
 
     def __init__(self, host, api_key, port=6083, ca_cert=None, api_version=1):
-        if (host is None) and (api_key is None):
-            host = '127.0.0.1'
+        if host is None:
             try:
-                api_key = subprocess.check_output(['recnode-apikey']).strip()
-            except OSError:
-                raise ValueError('API key must be specified')
+                host = os.environ['MOTIF_HOST']
+            except KeyError:
+                pass
+            if not host:
+                host = '127.0.0.1'
+
+        if api_key is None:
+            try:
+                api_key = os.environ['MOTIF_API_KEY']
+            except KeyError:
+                pass
+            if not api_key:
+                try:
+                    api_key = subprocess.check_output(['recnode-apikey']).strip()
+                except OSError:
+                    pass
+
+        if not api_key:
+            raise ValueError('API key must be specified')
 
         if ca_cert is None:
             ca_cert = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'server.crt')
