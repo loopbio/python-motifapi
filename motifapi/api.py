@@ -132,10 +132,13 @@ class MotifApi(object):
            'io/(?P<name>[^\s /]+)/set': 'POST',
            }
 
-    def __init__(self, host, api_key, port=6083, ca_cert=None, api_version=1):
+    def __init__(self, host=None, api_key=None, port=6083, ca_cert=None, api_version=1):
+        self._log = logging.getLogger('motifapi')
+
         if host is None:
             try:
                 host = os.environ['MOTIF_HOST']
+                self._log.debug('took host from environment')
             except KeyError:
                 pass
             if not host:
@@ -144,11 +147,13 @@ class MotifApi(object):
         if api_key is None:
             try:
                 api_key = os.environ['MOTIF_API_KEY']
+                self._log.debug('took api_key from environment')
             except KeyError:
                 pass
             if not api_key:
                 try:
                     api_key = subprocess.check_output(['recnode-apikey']).strip()
+                    self._log.debug('took api-key from recnode-apikey subprocess')
                 except OSError:
                     pass
 
@@ -175,8 +180,6 @@ class MotifApi(object):
         self._host = host
         self._api_key = api_key
         self._port = port
-
-        self._log = logging.getLogger('motifapi')
 
     def _build_request(self, endpoint, data=None, method='GET'):
         if endpoint[0] == '/':
