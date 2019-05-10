@@ -130,6 +130,8 @@ class MotifApi(object):
            'schedule/camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
            'schedule/io/(?P<name>[^\s /]+)/set': 'POST',
            'schedule/camera/(?P<serial>[^\s /]+)/io/(?P<name>[^\s /]+)/set': 'POST',
+           'schedule/cameras/configure/(?P<name>[^\s /]+)': 'POST',
+           'schedule/camera/(?P<serial>[^\s /]+)/configure/(?P<name>[^\s /]+)': 'POST',
            'io/(?P<io_serial>[^\s /]+)/(?P<io_port>[^\s /]+)/set': 'POST',
            'io/(?P<name>[^\s /]+)/set': 'POST',
            }
