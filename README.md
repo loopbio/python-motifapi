@@ -4,8 +4,7 @@ Python API for Motif Recording Systems
 This library allows you to control cameras and recording on loopbio motif recording
 systems.
 
-Getting Started
----------------
+## Getting Started
 
 * this library works out of the box on Python2 and Python3 and has no dependencies outside
   of the standard library
@@ -18,8 +17,7 @@ Getting Started
     command `recnode-apikey`
 * this library wraps the REST+JSON API and handles sending and parsing the responses
 
-Examples
---------
+### Examples
 
 Set up the connection to the machine
 
@@ -75,32 +73,206 @@ api.call('camera/FAKE0')
 
 **See `examples/*.py` for further examples of API usage**
 
-Scheduling
-----------
+## API Documentation
 
-The API also supports defining scheduled tasks, this allows for example, to schedule recordings
-and their subsequent copy to storage to occur at specific times.
+The complete list of API endpoints/paths, as passed to `call(path, **arguments)`,
+can be found below. Text between `<` and `>` characters should be replaced
+with the appropriate values. Arguments are passed after the path, e.g.
+`api.call('recording/start', duration=5.0)`.
 
-Task scheduling re-uses [Cron syntax]() with some extensions. Specifically it utilises
-the [Cronex](https://github.com/ericpruitt/cronex/blob/057509738a86ea70bddbfe853736fa4ef6f67f3b/README.md) library
-and supports the formats mentioned there (including monotonic tasks with `%` markup). All times are
-in local-time of the machine running the recording software. We recommend using the
-[corntab](http://corntab.com/) website to validate your cron expressions.
+ * `version`
+   * return the current software version
+ * `cameras`
+   * return a list of connected cameras and their status
+ * `camera/<serial>`
+   * returns the selected camera status
+   * `serial`: the serial number of the camera
+ * `camera/<serial>/configure`
+   * change camera configuration
+   * `serial`: the serial number of the camera
+   * arguments (for example, optional)
+     * `AcquisitionFrameRate`: change the framerate of the camera
+     * `ExposureTime`: exposure time in us
+     * `...` or any other camera supported parameter name and value
+ * `cameras/configure`
+   * as previous, but apply the configuration changes to every attached camera
+ * `camera/<serial>/recording/start`
+   * start recording on the selected camera
+   * `serial`: the serial number of the camera
+   * arguments
+     * `filename` (optional): recording filename (excluding timestamp)
+     * `record_to_store` (optional)
+       * `True`
+       * `False`
+       * no argument provided: use configured defaults
+     * `codec` (optional): code identifier or use configured default (if omitted)
+     * `duration` (optional): number of seconds to record for, or indefinately if omitted
+     * `metadata` (optional): a dictionary of metadata to save in the resulting video
+ * `recording/start`
+   * as previous, but start recording on all cameras
+ * `camera/<serial>/recording/stop`
+   * stop recording on the selected camera
+   * `serial`: the serial number of the camera
+ * `recording/stop`
+   * as previous, but stop recording on all cameras
+ * `camera/<serial>/recordings`
+   * return a list of recordings
+   * `serial`: the serial number of the camera
+ * `recordings`
+   * as previous, but return recordings for all cameras
+ * `camera/<serial>/recordings/copy_all`
+   * copy (or move) all currently completed recordings to another location
+   * `serial`: the serial number of the camera
+   * arguments
+     * `location` (optional): local user path or if omitted, default configued location
+     * `delete_after` (optional, default=False): delete original recordings after successful copy
+     * `loopy_username` (optional)
+     * `loopy_url` (optional)
+     * `loopy_api_key` (optional)
+     * `loopy_import_base` (optional)
+     * connection details of accesibly self hosted loopy instance for automatic
+       importing of videos into loopy after copy finishes
+ * `recordings/copy_all`
+   * as previous, but copy recordings from all cameras
+ * `camera/<serial>/recordings/export_all`
+   * export image stores to normal mp4 videos (or image stores)
+   * `serial`: the serial number of the camera
+   * arguments
+     * `to_store` (optional)
+       * `True`
+       * `False`
+       * no argument provided: use configured defaults
+     * `codec` (optional)
+     * `delete_after` (optional)
+     * `path` (optional)
+ * `recordings/export_all`
+   * as previous, but export image stores from all cameras
+ * `camera/<serial>/io/<name>/set`
+   * set named output associated with camera to provided value
+   * `serial`: the serial number of the camera
+   * `name`: the name of the configured output channel
+   * arguments
+     * `value`: the value to set on the output (backend dependent)
+ * `io/<name>/set`
+   * set named ouput to the provided value. in index or master mode in
+     a multiple camera setup, the named output channel must be on a
+     output device attached to the master or index node.
+     setup (or to the only attached camera in a single camera setup) 
+   * `name`: the name of the configured output channel
+   * arguments
+     * `value`: the value to set on the output (backend dependent)
+ * `io/<io_serial>/<io_port>/set` (DEPRECATED)
+   * configure and set output to provided value
+   * `io_serial`: serial number of IO device
+   * `io_port`: port on device to set
+   * arguments
+     * `value`: continuous value to set OR
+     * `state`: 0 or 1 to turn on or off
 
-To list currently scheduled tasks (and the current machine time)
 
-```python
-print(api.call('schedule'))
-```
+## Scheduling Function
+
+Motif allows scheduling of almost all previously documented API operations.
+Scheduling allows executing a certain operation as a defined time. 
+
+This allows for example, to schedule recordings and their subsequent copy
+to storage to occur at specific times.
+
+All times are in local-time of the machine running the recording software.
+We recommend using the [corntab](http://corntab.com/) website to
+validate your cron expressions. XXXX QUARTZ WEBSITE
+
+Task scheduling re-uses [Cron syntax]() with some extensions. 
+
+### Cron Syntax
+
+XXX CRONEX DOCS
+
+### Scheduling API Documentation
 
 The API for scheduling tasks is very similar to that of other tasks - API endpoints are
-prefixed with `schedule/VERB` and require passing two compulsory additional parameters,
-`task_name` and `cron_expression`. For example, to schedule a 30 minute recording as configured above
+prefixed with `schedule/VERB` may/should be passed additional optional or
+compulsory arguments.
+
+**Scheduling specific arguments**
+
+   * `task_name` (required): A unique shor identifier for this task
+   * `cron_expression` (required): a cron specifier conforming to the cron syntax above
+   * `camera_relative` (optional, Motif 5 and above only)
+     * `True`: if true all absolute and relative dates are relative to the start of the recording
+     * `False` (default): all dates are absolute, and monotonic expressions are relative to 1-Jan-1970
+
+**API**
+
+ * `schedule`
+   * list all scheduled tasks, return also including the current time on
+     the system
+ * `schedule/clear`
+   * delete all scheduled tasks
+ * `schedule/<task_name>/clear`
+   * delete the provided task
+   * `task_name`: the identifier of the task to clear 
+ * `schedule/camera/<serial>/recording/start`
+   * schedule the start of recording on the selected camera
+   * `serial`: the serial number of the camera
+   * arguments
+     * scheduling specific (above), excluding `camera_relative`
+     * see `recording/start` (above)
+ * `schedule/recording/start`
+   * as previous, but schedule the start of recording on all cameras
+ * `schedule/camera/<serial>/recordings/copy_all`
+   * schedule copy (or move) of recordings
+   * `serial`: the serial number of the camera
+   * arguments
+     * scheduling specific (above), excluding `camera_relative`
+     * see `recordings/copy_all` (above)
+ * `schedule/recordings/copy_all`
+   * as previous, but schedule copy (or move) of recordings on all cameras
+ * `schedule/camera/<serial>/recordings/export_all`
+   * schedule export of recordings on the selected camera
+   * `serial`: the serial number of the camera
+   * arguments
+     * scheduling specific (above), excluding `camera_relative`
+     * see `recordings/export_all`
+ * `schedule/recordings/export_all`
+   * as previous, but schedule export of recordings on all cameras
+ * `schedule/camera/<serial>/configure/<name>`
+   * schedule the change of a camera configuration
+   * `serial`: the serial number of the camera
+   * `name`: the the name of the parameter to change (e.g. `ExposureTime`)
+   * arguments
+     * scheduling specific (above)
+     * `value` (required): the new value of the parameter
+ * `schedule/cameras/configure/<name>`
+   * as previous, but schedule the change of camera configuration on all cameras
+ * `schedule/camera/<serial>/io/<name>/set`
+   * schedule the setting of a named output, on an IO device connected to the
+     supplied camera, to a provided value
+   * `serial`: the serial number of the camera
+   * `name`: the name of the configured output channel
+   * arguments
+     * scheduling specific (above)
+     * `value` (required): the new value of the parameter
+ * `schedule/io/<name>/set`
+   * schedule the setting of the named ouput to the provided value.
+     in index or master mode in a multiple camera setup, the named output
+     channel must be on a output device attached to the master or index node.
+   * arguments
+     * scheduling specific (above)
+     * `value` (required): the new value of the parameter
+
+### Scheduling Examples ###
+
+To schedule a 30 minute recording as configured above
 to be executed every-hour-on-the-hour between 9am and 4pm, make the following API call
 
 ```python
-api.call('schedule/recording/start', task_name='record_video', cron_expression='0 06-16 * * *',
-                                     codec='low', duration=30*60)
+api.call('schedule/recording/start',
+         task_name='record_video',
+         cron_expression='0 6-16 * * * *',
+         duration=30*60)
 ```
 
 **See examples/scheduler.py for more information**
+
+
