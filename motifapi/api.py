@@ -120,7 +120,6 @@ class MotifApi(object):
            'recordings/export_all$': 'POST',
            'schedule$': 'GET',
            'schedule/clear$': 'POST',
-           'schedule/clear$': 'POST',
            'schedule/(?P<identifier>[^\s /]+)/clear$': 'DELETE',
            'schedule/recording/start$': 'POST',
            'schedule/camera/(?P<serial>[^\s /]+)/recording/start$': 'POST',
