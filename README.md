@@ -283,7 +283,8 @@ Note: You must provide the HTTPS server certificate and authenticaion API key in
 
 ### Example Use From MATLAB
 
-(for the hypothetical IP address and API_KEY listed in the first example)
+Note: Examples for the hypothetical IP address and API_KEY listed in the first example. Please replace with your own
+Note: `server.crt` must be the full path to the `server.crt` file in this repository
 
 ```matlab
 % example showing how to list connected cameras from MATLAB
