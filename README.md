@@ -22,9 +22,7 @@ systems.
 Set up the connection to the machine
 
 ```python
-
 from motifapi import MotifApi
-
 
 IP_ADDRESS = '10.11.12.23'
 API_KEY = 'abcdef123456abcdef123456abcdef12'
@@ -32,6 +30,8 @@ API_KEY = 'abcdef123456abcdef123456abcdef12'
 api = MotifApi(IP_ADDRESS, API_KEY)
 # check the client is connected
 api.call('version')
+# list the connected cameras
+api.call('cameras')
 ```
 
 To start recording on all cameras with the predefined compression settings named 'high'
@@ -275,4 +275,31 @@ api.call('schedule/recording/start',
 
 **See examples/scheduler.py for more information**
 
+## Other Languages
 
+The API is a pure REST api, which means any language / framework / environment with support for calling REST+JSON endpoints and handling their responses is supported.
+
+Note: You must provide the HTTPS server certificate and authenticaion API key in a manner appropriate for your language / framework / environment.
+
+### Example Use From MATLAB
+
+(for the hypothetical IP address and API_KEY listed in the first example)
+
+```matlab
+% example showing how to list connected cameras from MATLAB
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'})
+# list the connected cameras
+webread('https://10.11.12.23:6083/api/1/cameras', o)
+```
+
+```matlab
+% example showing how to set an output using a POST request
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
+               'MediaType', 'application/json')
+arguments = struct('value',0.3);
+webwrite('https://127.0.0.1:6083/api/1/io/led/set',arguments,o)
+```
+
+Note: not all endpoints are `POST`, although most are. The endpoint type is documented in `motifapi/api.py`
