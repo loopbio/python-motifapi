@@ -169,6 +169,12 @@ with the appropriate values. Arguments are passed after the path, e.g.
      * `value`: continuous value to set OR
      * `state`: 0 or 1 to turn on or off
 
+**Outputs and Toggling Values**
+
+There exists a special value for (digital) outputs that results in the output state being
+toggled (alternating) between minimum and maximum values. If you pass `value=+inf` then this means
+start with a switch to maximum, then toggle between minimum and maximum subsequently. `value=-inf`
+start with a switch to minimum, then toggle between maximum and minimum subsequently.
 
 ## Scheduling Function
 
@@ -228,10 +234,9 @@ With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers
     * with `camera_relative=False` means *execute every 2 hours starting at 00:00:00*
       * e.g. Fri May 17 00:00:00 UTC 2019, Fri May 17 02:00:00 UTC 2019
     * with `camera_relative=True` means *execute every 2 hours starting at the time of recording start*
+       * e.g., for a recording started at Fri May 17 13:14:00 UTC 2019, the task would trigger at Fri May 17 15:14:00 UTC 2019, Fri May 17 17:14:00 UTC 2019, etc.
 
-
-
-**API**
+**API (continued)**
 
  * `schedule`
    * list all scheduled tasks, return also including the current time on
