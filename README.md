@@ -14,9 +14,9 @@ you to implement experimental or operational protocols like;
 **Table of Contents**
 
  * [Examples](#examples)
- * [Examples (IO and Scheduling)](#examples-io-scheduling)
+ * [Examples (IO and Scheduling)](#scheduling-examples)
  * [API Documentation](#api-documentation)
- * [Scheduling](#cron-syntax)
+ * [Scheduling](#scheduling-function)
  * [API Documentation (Scheduling)](#scheduling-api-documentation)
  * [Realtime Streaming](#realtime-streaming)
 
@@ -313,7 +313,7 @@ With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers
      * scheduling specific (above)
      * `value` (required): the new value of the parameter
 
-## Scheduling Examples ##
+## Scheduling Examples
 
 To schedule a 30 minute recording as configured above
 to be executed every-hour-on-the-hour between 9am and 4pm, make the following API call
