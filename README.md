@@ -176,17 +176,27 @@ Motif allows scheduling of almost all previously documented API operations.
 Scheduling allows executing a certain operation as a defined time. 
 
 This allows for example, to schedule recordings and their subsequent copy
-to storage to occur at specific times.
-
-All times are in local-time of the machine running the recording software.
-We recommend using the [corntab](http://corntab.com/) website to
-validate your cron expressions. XXXX QUARTZ WEBSITE
-
-Task scheduling re-uses [Cron syntax]() with some extensions. 
+to storage to occur at specific times. Task scheduling re-uses [Cron syntax]()
+with some extensions. 
 
 ### Cron Syntax
 
-XXX CRONEX DOCS
+Please refer to [here](README.cronex.md) for a complete specification and more examples.
+
+Each scheduled operation is specified with a combination of six white-space
+separated fields that dictate when the event should occur. In order, the fields
+specify trigger times for the second, minute, hour, day of the month,
+month and day of the week.
+
+    .------------------ Second (0 - 59)
+    |   .--------------- Minute (0 - 59)
+    |   |   .------------ Hour (0 - 23)
+    |   |   |   .--------- Day of the month (1 - 31)
+    |   |   |   |   .------ Month (1 - 12) or Jan, Feb ... Dec
+    |   |   |   |   |   .---- Day of the week (0 (Sun.; also 7) - 6 (Sat.))
+    |   |   |   |   |   |
+    V   V   V   V   V   V
+    *   *   *   *   *   *
 
 ### Scheduling API Documentation
 
@@ -201,6 +211,25 @@ compulsory arguments.
    * `camera_relative` (optional, Motif 5 and above only)
      * `True`: if true all absolute and relative dates are relative to the start of the recording
      * `False` (default): all dates are absolute, and monotonic expressions are relative to 1-Jan-1970
+
+**Camera Relative Schedules**
+
+Please ensure you have read the [full documentation](README.cronex.md) on cron triggers first. Often one needs to schedule events not in the conventional cron sense - relative to the date and time of the day, but instead wants to schedule operations relative to when a recording was started. If a task is scheduled with `camera_relative=True` then dates are interpreted differently. For example the expression
+
+ * `0 5 * ? * * *`
+   * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour*
+     * e.g. Fri May 17 16:05:00 UTC 2019, Fri May 17 17:05:00 UTC 2019, Fri May 17 18:05:00 UTC 2019
+   * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour* relative to when recording was started.
+     * e.g., for a recording started at Fri May 17 13:14:00 UTC 2019, the task would trigger at Fri May 17 13:19:00 UTC 2019, Fri May 17 14:19:00 UTC 2019, etc.
+
+With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers execute *every unit of time*. For example the expression
+
+ * `0 * %2 ? * * *`
+    * with `camera_relative=False` means *execute every 2 hours starting at 00:00:00*
+      * e.g. Fri May 17 00:00:00 UTC 2019, Fri May 17 02:00:00 UTC 2019
+    * with `camera_relative=True` means *execute every 2 hours starting at the time of recording start*
+
+
 
 **API**
 
