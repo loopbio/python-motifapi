@@ -313,7 +313,7 @@ With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers
      * scheduling specific (above)
      * `value` (required): the new value of the parameter
 
-### Scheduling Examples ###
+## Scheduling Examples ##
 
 To schedule a 30 minute recording as configured above
 to be executed every-hour-on-the-hour between 9am and 4pm, make the following API call
@@ -326,6 +326,44 @@ api.call('schedule/recording/start',
 ```
 
 **See examples/scheduler.py for more information**
+
+## Realtime Streaming
+
+Motif can, with very low latency (&lt;1ms), stream realtime images from the camera, without interfering with
+the recording, compression, or any other motif functions. This allows developing *out of process* realtime
+image processing algorithms for closed loop experiments. Such experiments could for example then provide
+stimulus to the animal using either Motif connected and configured outputs, or other user provided methods.
+
+Per default streaming is limited to localhost (so such scripts must run on the same PC as Motif), however
+Motif can be configured to stream also to other network locations if you are aware of the latency
+implications and have sufficient network infrastructure.
+
+### Streaming Images
+
+A realtime image stream can be established as follows (after constructing the `api` object with the correct IP address and API_KEY as indicated above
+
+```python
+# small example using opencv to show the image in realtime, outside of motif
+
+stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_IMAGE)
+if stream is not None:
+    while True:
+        I, md = stream.get_next_image()
+        cv2.imshow('live', I)
+        cv2.waitKey(1)
+```
+
+### Streaming State
+
+If you have other more custom data acquisition needs not supported by Motif IO / DAQ support, and want to subsequently 
+integrate or synchronize this custom data with the motif imagestore `frame_number`s and `frame_time`s then you can use the realtime state streaming. Motif publishes to this stream, at low latency (&lt;&lt;1ms), the current `frame_number`, `frame_time`, and other information. A realtime state stream is established as follows
+
+```python
+stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_STATE)
+if stream is not None:
+    while True:
+        print stream.get_next_state()
+```
 
 ## Other Languages
 
