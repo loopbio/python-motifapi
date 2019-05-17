@@ -1,8 +1,24 @@
 Python API for Motif Recording Systems
 ======================================
 
-This library allows you to control cameras and recording on loopbio motif recording
-systems.
+This library allows you to control cameras and recording on loopbio [motif](http://loopbio.com/recording)
+recording systems, including the ability to control outputs and schedule operations. This allows
+you to implement experimental or operational protocols like;
+
+ * "start recording every hour for 30 minues. while recording give this stimulus (switch this output)
+    every 5 minutes"
+ * "record at 9am and 3pm. at 5pm copy all recorded videos to network storage"
+ * "while recording, at minute 1 switch this output on, then every 30 seconds thereafter, switch on and
+    off this other output"
+
+**Table of Contents**
+
+ * [Examples](#examples)
+ * [Examples (IO and Scheduling)](#examples-io-scheduling)
+ * [API Documentation](#api-documentation)
+ * [Scheduling](#cron-syntax)
+ * [API Documentation (Scheduling)](#scheduling-api-documentation)
+ * [Realtime Streaming](#realtime-streaming)
 
 ## Getting Started
 
@@ -16,6 +32,8 @@ systems.
     control, SSH into the machine (or request your sysadmin to) and execute the following
     command `recnode-apikey`
 * this library wraps the REST+JSON API and handles sending and parsing the responses
+* this library is compatible with all motif versions, although real-time image streaming and
+  some IO operations are only supported in motif 5 and above
 
 ### Examples
 
