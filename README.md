@@ -325,7 +325,7 @@ api.call('schedule/recording/start',
          duration=30*60)
 ```
 
-*** FAQ ***
+** FAQ **
 
 * Q) What if Motif is running on another computer? how to I find the time on the system
 
