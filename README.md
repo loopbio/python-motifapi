@@ -325,6 +325,28 @@ api.call('schedule/recording/start',
          duration=30*60)
 ```
 
+*** FAQ ***
+
+* Q) What if Motif is running on another computer? how to I find the time on the system
+
+```python
+now = api.call('schedule')['now']
+dt = datetime.datetime.fromtimestamp(now)
+```
+
+ * Q) What is the easiest way to schedule something to happen 'some time from now'
+ 
+ ```python
+# following from the example above
+import datetime
+from motifapi import datetime_to_cron
+future = dt + datetime.timedelta(seconds=30)
+api.call('schedule/recording/start',
+         task_name='record_video_in_30s_time',
+         cron_expression=datetime_to_cron(future),
+         duration=30*60)
+ ```
+
 **See examples/scheduler.py for more information**
 
 ## Realtime Streaming
