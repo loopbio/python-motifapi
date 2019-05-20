@@ -315,8 +315,8 @@ With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers
 
 ## Scheduling Examples
 
-To schedule a 30 minute recording as configured above
-to be executed every-hour-on-the-hour between 9am and 4pm, make the following API call
+To schedule a 30 minute recording as configured above to be executed every-hour-on-the-hour between
+9am and 4pm, make the following API call
 
 ```python
 api.call('schedule/recording/start',
@@ -324,6 +324,54 @@ api.call('schedule/recording/start',
          cron_expression='0 6-16 * * * *',
          duration=30*60)
 ```
+
+To schedule events relative to the start of recording on a specific camera, consider the following examples.
+
+```python
+import datetime
+from motifapi import datetime_to_cron
+
+camera_serial = '123456'
+io_name = 'led'
+
+# note the use of datetime_to_cron() which converts an absolute date/time to a non-repeating
+# non-monotonic cron expression. Furthermore, note that because this should occure 17s relative
+# to the start of recording, we pass a datetime initilized from 0 seconds.
+
+api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
+         task_name='led_on_after_17s',
+         cron_expression=datetime_to_cron(datetime.datetime.fromtimestamp(0) + datetime.timedelta(seconds=17)),
+         camera_relative=True,
+         value=1.0)
+```
+
+monotonic expressions do not require the use of `datetime_to_cron` as the repeat regardles. For example the following expression flashes / toggles an LED every second
+
+```python
+api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
+         task_name='toggle_led_2s',
+         cron_expression='%2 * * ? * * *',
+         camera_relative=True,
+         value=float('+inf'))
+```
+
+neither to regular repeating cron expressions. Consider the following two scheduled operations that turn on an LED at `00:15:00` and `00:45:00` and turn it off at `00:00:00` and `00:30:00`.
+
+```python
+api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
+         task_name='turn_on_led',
+         cron_expression='0 15,45 * ? * * *',
+         camera_relative=True,
+         value=1.0)
+api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
+         task_name='turn_off_led',
+         cron_expression='0 0,30 * ? * * *',
+         camera_relative=True,
+         value=0.0)
+```
+
+note: this same sequence of operations could have likewise been described using a monotonic expression `0 15%15 * ? * * *` and 'toggling IO (see above)' `value=float(+inf)`.
+
 
 **FAQ**
 
@@ -346,6 +394,10 @@ api.call('schedule/recording/start',
          cron_expression=datetime_to_cron(future),
          duration=30*60)
  ```
+ 
+ * Q) Cron expressions are confusing. Can you recommend ways to help understanding
+   * you can test and design cron expressions here https://www.freeformatter.com/cron-expression-generator-quartz.html 
+     or https://cronexpressiondescriptor.azurewebsites.net/ (note: neither support monotonic expressions)
 
 **See examples/scheduler.py for more information**
 
