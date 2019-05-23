@@ -1,5 +1,5 @@
-Python API for Motif Recording Systems
-======================================
+API for Motif Recording Systems (Python Wrapper)
+================================================
 
 This library allows you to control cameras and recording on loopbio [motif](http://loopbio.com/recording)
 recording systems, including the ability to control outputs and schedule operations. This allows
@@ -19,6 +19,7 @@ you to implement experimental or operational protocols like;
  * [Scheduling](#scheduling-function)
  * [API Documentation (Scheduling)](#scheduling-api-documentation)
  * [Realtime Streaming](#realtime-streaming)
+ * [MATLAB](#matlab) and [Other Language](#other-languages) support
 
 ## Getting Started
 
