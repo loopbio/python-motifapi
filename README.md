@@ -101,7 +101,7 @@ with the appropriate values. Arguments are passed after the path, e.g.
  * `version`
    * return the current software version
  * `cameras`
-   * return a list of connected cameras and their status
+   * return a list of connected cameras, their names and serial numbers
  * `camera/<serial>`
    * returns the selected camera status
    * `serial`: the serial number of the camera
