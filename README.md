@@ -445,18 +445,26 @@ The API is a pure REST api, which means any language / framework / environment w
 
 Note: You must provide the HTTPS server certificate and authenticaion API key in a manner appropriate for your language / framework / environment.
 
-### Example Use From MATLAB
+### MATLAB
 
-Note: Examples for the hypothetical IP address and API_KEY listed in the first example. Please replace with your own
-Note: `server.crt` must be the full path to the `server.crt` file in this repository
+Because the Motif API is pure HTTP+JSON you can also use MATLAB to control the recording systems. Note however the following caveats
+
+* Examples below are for the hypothetical IP address `10.11.12.13` and API_KEY `abcdef123456abcdef123456abcdef12`. Please replace with values appropriate to your system
+  * On windows, you can find the API key in the config file (link in Start menu), on Linux by executing `recnode-apikey` on the PC
+* `server.crt` must be the full path to the `server.crt` file which you should [download](https://raw.githubusercontent.com/loopbio/python-motifapi/master/motifapi/server.crt) from this repository. 
+* Not all endpoints are `POST`, although most are. `GET` endpoints are read using `webread`, `POST`, `PATCH`, `DELETE` using `webwrite`. The endpoint type is documented in [api.py](motifapi/api.py).
+
+**Checking Status**
 
 ```matlab
 % example showing how to list connected cameras from MATLAB
 o = weboptions('CertificateFilename', 'server.crt', ...
                'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'})
 # list the connected cameras
-webread('https://10.11.12.23:6083/api/1/cameras', o)
+webread('https://10.11.12.13:6083/api/1/cameras', o)
 ```
+
+**Turning on an Output**
 
 ```matlab
 % example showing how to set an output using a POST request
@@ -464,7 +472,25 @@ o = weboptions('CertificateFilename', 'server.crt', ...
                'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
                'MediaType', 'application/json')
 arguments = struct('value',0.3);
-webwrite('https://127.0.0.1:6083/api/1/io/led/set',arguments,o)
+webwrite('https://10.11.12.13:6083/api/1/io/led/set',arguments,o)
 ```
 
-Note: not all endpoints are `POST`, although most are. The endpoint type is documented in `motifapi/api.py`
+**Starting Recording**
+
+```matlab
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
+               'MediaType', 'application/json')
+arguments = struct('codec','h264');
+webwrite('https://10.11.12.13:6083/api/1/recording/start',arguments,o)
+```
+
+**Stopping Recording**
+
+```matlab
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
+               'MediaType', 'application/json')
+arguments = struct('codec','h264');
+webwrite('https://10.11.12.13:6083/api/1/recording/stop',arguments,o)
+```
