@@ -124,9 +124,10 @@ with the appropriate values. Arguments are passed after the path, e.g.
        * `True`
        * `False`
        * no argument provided: use configured defaults
-     * `codec` (optional): code identifier or use configured default (if omitted)
+     * `codec` (optional): codec, or use configured default if omitted
      * `duration` (optional): number of seconds to record for, or indefinately if omitted
      * `metadata` (optional): a dictionary of metadata to save in the resulting video
+     * `codec_identifier` (optional): advanced use only
  * `recording/start`
    * as previous, but start recording on all cameras
  * `camera/<serial>/recording/stop`
