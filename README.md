@@ -406,6 +406,8 @@ api.call('schedule/recording/start',
 
 **See examples/scheduler.py for more information**
 
+<!---motifcutstart--->
+
 ## Realtime Streaming
 
 Motif can, with very low latency (&lt;1ms), stream realtime images from the camera, without interfering with
@@ -416,8 +418,6 @@ stimulus to the animal using either Motif connected and configured outputs, or o
 Per default streaming is limited to localhost (so such scripts must run on the same PC as Motif), however
 Motif can be configured to stream also to other network locations if you are aware of the latency
 implications and have sufficient network infrastructure.
-
-<!---motifcutstart--->
 
 ### Streaming Images
 
