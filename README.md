@@ -110,24 +110,24 @@ with the appropriate values. Arguments are passed after the path, e.g.
     * change camera configuration
     * `serial`: the serial number of the camera
     * arguments (for example, optional)
-       * `AcquisitionFrameRate`: change the framerate of the camera
-       * `ExposureTime`: exposure time in us
-       * `...` or any other camera supported parameter name and value
+        * `AcquisitionFrameRate`: change the framerate of the camera
+        * `ExposureTime`: exposure time in us
+        * `...` or any other camera supported parameter name and value
  * `cameras/configure`
     * as previous, but apply the configuration changes to every attached camera
  * `camera/<serial>/recording/start`
     * start recording on the selected camera
     * `serial`: the serial number of the camera
     * arguments
-       * `filename` (optional): recording filename (excluding timestamp)
-       * `record_to_store` (optional)
-          * `True`
-          * `False`
-          * no argument provided: use configured defaults
-       * `codec` (optional): codec, or use configured default if omitted
-       * `duration` (optional): number of seconds to record for, or indefinately if omitted
-       * `metadata` (optional): a dictionary of metadata to save in the resulting video
-       * `codec_identifier` (optional): advanced use only
+        * `filename` (optional): recording filename (excluding timestamp)
+        * `record_to_store` (optional)
+             * `True`
+             * `False`
+             * no argument provided: use configured defaults
+        * `codec` (optional): codec, or use configured default if omitted
+        * `duration` (optional): number of seconds to record for, or indefinately if omitted
+        * `metadata` (optional): a dictionary of metadata to save in the resulting video
+        * `codec_identifier` (optional): advanced use only
  * `recording/start`
     * as previous, but start recording on all cameras
  * `camera/<serial>/recording/stop`
@@ -144,12 +144,12 @@ with the appropriate values. Arguments are passed after the path, e.g.
     * copy (or move) all currently completed recordings to another location
     * `serial`: the serial number of the camera
     * arguments
-       * `location` (optional): local user path or if omitted, default configued location
-       * `delete_after` (optional, default=False): delete original recordings after successful copy
-       * `loopy_username` (optional)
-       * `loopy_url` (optional)
-       * `loopy_api_key` (optional)
-       * `loopy_import_base` (optional):
+        * `location` (optional): local user path or if omitted, default configued location
+        * `delete_after` (optional, default=False): delete original recordings after successful copy
+        * `loopy_username` (optional)
+        * `loopy_url` (optional)
+        * `loopy_api_key` (optional)
+        * `loopy_import_base` (optional):
           connection details of accesibly self hosted loopy instance for automatic
           importing of videos into loopy after copy finishes
  * `recordings/copy_all`
@@ -158,10 +158,10 @@ with the appropriate values. Arguments are passed after the path, e.g.
     * export image stores to normal mp4 videos (or image stores)
     * `serial`: the serial number of the camera
     * arguments
-       * `to_store` (optional)
-          * `True`
-          * `False`
-          * no argument provided: use configured defaults
+        * `to_store` (optional)
+            * `True`
+            * `False`
+            * no argument provided: use configured defaults
        * `codec` (optional)
        * `delete_after` (optional)
        * `path` (optional)
@@ -172,7 +172,7 @@ with the appropriate values. Arguments are passed after the path, e.g.
     * `serial`: the serial number of the camera
     * `name`: the name of the configured output channel
     * arguments
-       * `value`: the value to set on the output (backend dependent)
+        * `value`: the value to set on the output (backend dependent)
  * `io/<name>/set`
     * set named ouput to the provided value. in index or master mode in
       a multiple camera setup, the named output channel must be on a
@@ -180,14 +180,14 @@ with the appropriate values. Arguments are passed after the path, e.g.
       setup (or to the only attached camera in a single camera setup) 
     * `name`: the name of the configured output channel
     * arguments
-       * `value`: the value to set on the output (backend dependent)
+        * `value`: the value to set on the output (backend dependent)
  * `io/<io_serial>/<io_port>/set` (DEPRECATED)
     * configure and set output to provided value
     * `io_serial`: serial number of IO device
     * `io_port`: port on device to set
     * arguments
-       * `value`: continuous value to set OR
-       * `state`: 0 or 1 to turn on or off
+        * `value`: continuous value to set OR
+        * `state`: 0 or 1 to turn on or off
 
 **Outputs and Toggling Values**
 
@@ -214,6 +214,7 @@ separated fields that dictate when the event should occur. In order, the fields
 specify trigger times for the second, minute, hour, day of the month,
 month and day of the week.
 
+```text
     .------------------ Second (0 - 59)
     |   .--------------- Minute (0 - 59)
     |   |   .------------ Hour (0 - 23)
@@ -223,6 +224,7 @@ month and day of the week.
     |   |   |   |   |   |
     V   V   V   V   V   V
     *   *   *   *   *   *
+```
 
 ### Scheduling API Documentation
 
@@ -235,85 +237,85 @@ compulsory arguments.
    * `task_name` (required): A unique shor identifier for this task
    * `cron_expression` (required): a cron specifier conforming to the cron syntax above
    * `camera_relative` (optional, Motif 5 and above only)
-     * `True`: if true all absolute and relative dates are relative to the start of the recording
-     * `False` (default): all dates are absolute, and monotonic expressions are relative to 1-Jan-1970
+      * `True`: if true all absolute and relative dates are relative to the start of the recording
+      * `False` (default): all dates are absolute, and monotonic expressions are relative to 1-Jan-1970
 
 **Camera Relative Schedules**
 
 Please ensure you have read the [full documentation](README.cronex.md) on cron triggers first. Often one needs to schedule events not in the conventional cron sense - relative to the date and time of the day, but instead wants to schedule operations relative to when a recording was started. If a task is scheduled with `camera_relative=True` then dates are interpreted differently. For example the expression
 
  * `0 5 * ? * * *`
-   * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour*
-     * e.g. Fri May 17 16:05:00 UTC 2019, Fri May 17 17:05:00 UTC 2019, Fri May 17 18:05:00 UTC 2019
-   * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour* relative to when recording was started.
-     * e.g., for a recording started at Fri May 17 13:14:00 UTC 2019, the task would trigger at Fri May 17 13:19:00 UTC 2019, Fri May 17 14:19:00 UTC 2019, etc.
+    * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour*
+        * e.g. Fri May 17 16:05:00 UTC 2019, Fri May 17 17:05:00 UTC 2019, Fri May 17 18:05:00 UTC 2019
+    * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour* relative to when recording was started.
+        * e.g., for a recording started at Fri May 17 13:14:00 UTC 2019, the task would trigger at Fri May 17 13:19:00 UTC 2019, Fri May 17 14:19:00 UTC 2019, etc.
 
 With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers execute *every unit of time*. For example the expression
 
  * `0 * %2 ? * * *`
     * with `camera_relative=False` means *execute every 2 hours starting at 00:00:00*
-      * e.g. Fri May 17 00:00:00 UTC 2019, Fri May 17 02:00:00 UTC 2019
+        * e.g. Fri May 17 00:00:00 UTC 2019, Fri May 17 02:00:00 UTC 2019
     * with `camera_relative=True` means *execute every 2 hours starting at the time of recording start*
-       * e.g., for a recording started at Fri May 17 13:14:00 UTC 2019, the task would trigger at Fri May 17 15:14:00 UTC 2019, Fri May 17 17:14:00 UTC 2019, etc.
+        * e.g., for a recording started at Fri May 17 13:14:00 UTC 2019, the task would trigger at Fri May 17 15:14:00 UTC 2019, Fri May 17 17:14:00 UTC 2019, etc.
 
 **API (continued)**
 
  * `schedule`
-   * list all scheduled tasks, return also including the current time on
-     the system
+    * list all scheduled tasks, return also including the current time on
+      the system
  * `schedule/clear`
-   * delete all scheduled tasks
+    * delete all scheduled tasks
  * `schedule/<task_name>/clear`
-   * delete the provided task
-   * `task_name`: the identifier of the task to clear 
+    * delete the provided task
+    * `task_name`: the identifier of the task to clear 
  * `schedule/camera/<serial>/recording/start`
-   * schedule the start of recording on the selected camera
-   * `serial`: the serial number of the camera
-   * arguments
-     * scheduling specific (above), excluding `camera_relative`
-     * see `recording/start` (above)
+    * schedule the start of recording on the selected camera
+    * `serial`: the serial number of the camera
+    * arguments
+        * scheduling specific (above), excluding `camera_relative`
+        * see `recording/start` (above)
  * `schedule/recording/start`
-   * as previous, but schedule the start of recording on all cameras
+    * as previous, but schedule the start of recording on all cameras
  * `schedule/camera/<serial>/recordings/copy_all`
-   * schedule copy (or move) of recordings
-   * `serial`: the serial number of the camera
-   * arguments
-     * scheduling specific (above), excluding `camera_relative`
-     * see `recordings/copy_all` (above)
+    * schedule copy (or move) of recordings
+    * `serial`: the serial number of the camera
+    * arguments
+        * scheduling specific (above), excluding `camera_relative`
+        * see `recordings/copy_all` (above)
  * `schedule/recordings/copy_all`
-   * as previous, but schedule copy (or move) of recordings on all cameras
+    * as previous, but schedule copy (or move) of recordings on all cameras
  * `schedule/camera/<serial>/recordings/export_all`
-   * schedule export of recordings on the selected camera
-   * `serial`: the serial number of the camera
-   * arguments
-     * scheduling specific (above), excluding `camera_relative`
-     * see `recordings/export_all`
+    * schedule export of recordings on the selected camera
+    * `serial`: the serial number of the camera
+    * arguments
+        * scheduling specific (above), excluding `camera_relative`
+        * see `recordings/export_all`
  * `schedule/recordings/export_all`
-   * as previous, but schedule export of recordings on all cameras
+    * as previous, but schedule export of recordings on all cameras
  * `schedule/camera/<serial>/configure/<name>`
-   * schedule the change of a camera configuration
-   * `serial`: the serial number of the camera
-   * `name`: the the name of the parameter to change (e.g. `ExposureTime`)
-   * arguments
-     * scheduling specific (above)
-     * `value` (required): the new value of the parameter
+    * schedule the change of a camera configuration
+    * `serial`: the serial number of the camera
+    * `name`: the the name of the parameter to change (e.g. `ExposureTime`)
+    * arguments
+        * scheduling specific (above)
+        * `value` (required): the new value of the parameter
  * `schedule/cameras/configure/<name>`
-   * as previous, but schedule the change of camera configuration on all cameras
+    * as previous, but schedule the change of camera configuration on all cameras
  * `schedule/camera/<serial>/io/<name>/set`
-   * schedule the setting of a named output, on an IO device connected to the
-     supplied camera, to a provided value
-   * `serial`: the serial number of the camera
-   * `name`: the name of the configured output channel
-   * arguments
-     * scheduling specific (above)
-     * `value` (required): the new value of the parameter
+    * schedule the setting of a named output, on an IO device connected to the
+      supplied camera, to a provided value
+    * `serial`: the serial number of the camera
+    * `name`: the name of the configured output channel
+    * arguments
+        * scheduling specific (above)
+        * `value` (required): the new value of the parameter
  * `schedule/io/<name>/set`
-   * schedule the setting of the named ouput to the provided value.
-     in index or master mode in a multiple camera setup, the named output
-     channel must be on a output device attached to the master or index node.
-   * arguments
-     * scheduling specific (above)
-     * `value` (required): the new value of the parameter
+    * schedule the setting of the named ouput to the provided value.
+      in index or master mode in a multiple camera setup, the named output
+      channel must be on a output device attached to the master or index node.
+    * arguments
+        * scheduling specific (above)
+        * `value` (required): the new value of the parameter
 
 ## Scheduling Examples
 
@@ -375,9 +377,9 @@ api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
 note: this same sequence of operations could have likewise been described using a monotonic expression `0 15%15 * ? * * *` and 'toggling IO (see above)' `value=float(+inf)`.
 
 
-**FAQ**
+## FAQ
 
-* Q) What if Motif is running on another computer? how to I find the time on the system
+ * Q) What if Motif is running on another computer? how to I find the time on the system
 
 ```python
 now = api.call('schedule')['now']
@@ -386,7 +388,7 @@ dt = datetime.datetime.fromtimestamp(now)
 
  * Q) What is the easiest way to schedule something to happen 'some time from now'
  
- ```python
+```python
 # following from the example above
 import datetime
 from motifapi import datetime_to_cron
@@ -395,11 +397,12 @@ api.call('schedule/recording/start',
          task_name='record_video_in_30s_time',
          cron_expression=datetime_to_cron(future),
          duration=30*60)
- ```
+```
  
  * Q) Cron expressions are confusing. Can you recommend ways to help understanding
-   * you can test and design cron expressions here https://www.freeformatter.com/cron-expression-generator-quartz.html 
-     or https://cronexpressiondescriptor.azurewebsites.net/ (note: neither support monotonic expressions)
+    * you can test and design cron expressions online using the following site (note: neither support monotonic expressions)
+        * [https://www.freeformatter.com/cron-expression-generator-quartz.html](https://www.freeformatter.com/cron-expression-generator-quartz.html) 
+        * [https://cronexpressiondescriptor.azurewebsites.net/](https://cronexpressiondescriptor.azurewebsites.net/) 
 
 **See examples/scheduler.py for more information**
 
@@ -413,6 +416,8 @@ stimulus to the animal using either Motif connected and configured outputs, or o
 Per default streaming is limited to localhost (so such scripts must run on the same PC as Motif), however
 Motif can be configured to stream also to other network locations if you are aware of the latency
 implications and have sufficient network infrastructure.
+
+<!---motifcutstart--->
 
 ### Streaming Images
 
@@ -440,6 +445,8 @@ if stream is not None:
     while True:
         print stream.get_next_state()
 ```
+
+<!---motifcutend--->
 
 ## Other Languages
 
