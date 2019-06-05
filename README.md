@@ -100,94 +100,94 @@ with the appropriate values. Arguments are passed after the path, e.g.
 `api.call('recording/start', duration=5.0)`.
 
  * `version`
-   * return the current software version
+    * return the current software version
  * `cameras`
-   * return a list of connected cameras, their names and serial numbers
+    * return a list of connected cameras, their names and serial numbers
  * `camera/<serial>`
-   * returns the selected camera status
-   * `serial`: the serial number of the camera
+    * returns the selected camera status
+    * `serial`: the serial number of the camera
  * `camera/<serial>/configure`
-   * change camera configuration
-   * `serial`: the serial number of the camera
-   * arguments (for example, optional)
-     * `AcquisitionFrameRate`: change the framerate of the camera
-     * `ExposureTime`: exposure time in us
-     * `...` or any other camera supported parameter name and value
+    * change camera configuration
+    * `serial`: the serial number of the camera
+    * arguments (for example, optional)
+       * `AcquisitionFrameRate`: change the framerate of the camera
+       * `ExposureTime`: exposure time in us
+       * `...` or any other camera supported parameter name and value
  * `cameras/configure`
-   * as previous, but apply the configuration changes to every attached camera
+    * as previous, but apply the configuration changes to every attached camera
  * `camera/<serial>/recording/start`
-   * start recording on the selected camera
-   * `serial`: the serial number of the camera
-   * arguments
-     * `filename` (optional): recording filename (excluding timestamp)
-     * `record_to_store` (optional)
-       * `True`
-       * `False`
-       * no argument provided: use configured defaults
-     * `codec` (optional): codec, or use configured default if omitted
-     * `duration` (optional): number of seconds to record for, or indefinately if omitted
-     * `metadata` (optional): a dictionary of metadata to save in the resulting video
-     * `codec_identifier` (optional): advanced use only
+    * start recording on the selected camera
+    * `serial`: the serial number of the camera
+    * arguments
+       * `filename` (optional): recording filename (excluding timestamp)
+       * `record_to_store` (optional)
+          * `True`
+          * `False`
+          * no argument provided: use configured defaults
+       * `codec` (optional): codec, or use configured default if omitted
+       * `duration` (optional): number of seconds to record for, or indefinately if omitted
+       * `metadata` (optional): a dictionary of metadata to save in the resulting video
+       * `codec_identifier` (optional): advanced use only
  * `recording/start`
-   * as previous, but start recording on all cameras
+    * as previous, but start recording on all cameras
  * `camera/<serial>/recording/stop`
-   * stop recording on the selected camera
-   * `serial`: the serial number of the camera
+    * stop recording on the selected camera
+    * `serial`: the serial number of the camera
  * `recording/stop`
-   * as previous, but stop recording on all cameras
+    * as previous, but stop recording on all cameras
  * `camera/<serial>/recordings`
-   * return a list of recordings
-   * `serial`: the serial number of the camera
+    * return a list of recordings
+    * `serial`: the serial number of the camera
  * `recordings`
-   * as previous, but return recordings for all cameras
+    * as previous, but return recordings for all cameras
  * `camera/<serial>/recordings/copy_all`
-   * copy (or move) all currently completed recordings to another location
-   * `serial`: the serial number of the camera
-   * arguments
-     * `location` (optional): local user path or if omitted, default configued location
-     * `delete_after` (optional, default=False): delete original recordings after successful copy
-     * `loopy_username` (optional)
-     * `loopy_url` (optional)
-     * `loopy_api_key` (optional)
-     * `loopy_import_base` (optional)
-     * connection details of accesibly self hosted loopy instance for automatic
-       importing of videos into loopy after copy finishes
+    * copy (or move) all currently completed recordings to another location
+    * `serial`: the serial number of the camera
+    * arguments
+       * `location` (optional): local user path or if omitted, default configued location
+       * `delete_after` (optional, default=False): delete original recordings after successful copy
+       * `loopy_username` (optional)
+       * `loopy_url` (optional)
+       * `loopy_api_key` (optional)
+       * `loopy_import_base` (optional):
+          connection details of accesibly self hosted loopy instance for automatic
+          importing of videos into loopy after copy finishes
  * `recordings/copy_all`
-   * as previous, but copy recordings from all cameras
+    * as previous, but copy recordings from all cameras
  * `camera/<serial>/recordings/export_all`
-   * export image stores to normal mp4 videos (or image stores)
-   * `serial`: the serial number of the camera
-   * arguments
-     * `to_store` (optional)
-       * `True`
-       * `False`
-       * no argument provided: use configured defaults
-     * `codec` (optional)
-     * `delete_after` (optional)
-     * `path` (optional)
+    * export image stores to normal mp4 videos (or image stores)
+    * `serial`: the serial number of the camera
+    * arguments
+       * `to_store` (optional)
+          * `True`
+          * `False`
+          * no argument provided: use configured defaults
+       * `codec` (optional)
+       * `delete_after` (optional)
+       * `path` (optional)
  * `recordings/export_all`
-   * as previous, but export image stores from all cameras
+    * as previous, but export image stores from all cameras
  * `camera/<serial>/io/<name>/set`
-   * set named output associated with camera to provided value
-   * `serial`: the serial number of the camera
-   * `name`: the name of the configured output channel
-   * arguments
-     * `value`: the value to set on the output (backend dependent)
+    * set named output associated with camera to provided value
+    * `serial`: the serial number of the camera
+    * `name`: the name of the configured output channel
+    * arguments
+       * `value`: the value to set on the output (backend dependent)
  * `io/<name>/set`
-   * set named ouput to the provided value. in index or master mode in
-     a multiple camera setup, the named output channel must be on a
-     output device attached to the master or index node.
-     setup (or to the only attached camera in a single camera setup) 
-   * `name`: the name of the configured output channel
-   * arguments
-     * `value`: the value to set on the output (backend dependent)
+    * set named ouput to the provided value. in index or master mode in
+      a multiple camera setup, the named output channel must be on a
+      output device attached to the master or index node.
+      setup (or to the only attached camera in a single camera setup) 
+    * `name`: the name of the configured output channel
+    * arguments
+       * `value`: the value to set on the output (backend dependent)
  * `io/<io_serial>/<io_port>/set` (DEPRECATED)
-   * configure and set output to provided value
-   * `io_serial`: serial number of IO device
-   * `io_port`: port on device to set
-   * arguments
-     * `value`: continuous value to set OR
-     * `state`: 0 or 1 to turn on or off
+    * configure and set output to provided value
+    * `io_serial`: serial number of IO device
+    * `io_port`: port on device to set
+    * arguments
+       * `value`: continuous value to set OR
+       * `state`: 0 or 1 to turn on or off
 
 **Outputs and Toggling Values**
 
