@@ -1,4 +1,5 @@
 import json
+import threading
 
 import zmq
 import numpy as np
@@ -47,3 +48,37 @@ class StateStreamer(object):
             _, msg = self.stream.recv_multipart()
             return json.loads(msg)
 
+
+class StateMirror(threading.Thread):
+
+    daemon = True
+
+    def __init__(self, streamer):
+        assert isinstance(streamer, StateStreamer)
+        threading.Thread.__init__(self)
+        self._lock = threading.Lock()
+        self._state = {}
+        self._streamer = streamer
+
+    @property
+    def is_recording(self):
+        return self._state.get('is_recording', False)
+
+    @property
+    def frame_number(self):
+        return self._state.get('frame_number', None)
+
+    @property
+    def frame_time(self):
+        return self._state.get('frame_time', None)
+
+    def get_state(self, **extra):
+        with self._lock:
+            extra.update(self._state)
+            return extra
+
+    def run(self):
+        while True:
+            _, msg = self._streamer.stream.recv_multipart()
+            with self._lock:
+                self._state.update(json.loads(msg))
