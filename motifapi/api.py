@@ -105,8 +105,10 @@ class MotifApi(object):
     API = {'version$': 'GET',
            'cameras$': 'GET',
            'cameras/configure$': 'PATCH',
+           'cameras/read/(?P<name>[^\s /]+)$': 'GET',
            'camera/(?P<serial>[^\s /]+)$': 'GET',
            'camera/(?P<serial>[^\s /]+)/configure$': 'PATCH',
+           'camera/(?P<serial>[^\s /]+)/read/(?P<name>[^\s /]+)$': 'GET',
            'camera/(?P<serial>[^\s /]+)/recording/start$': 'POST',
            'camera/(?P<serial>[^\s /]+)/recording/stop$': 'POST',
            'camera/(?P<serial>[^\s /]+)/recordings$': 'GET',
@@ -292,7 +294,6 @@ class MotifApi(object):
             _host = _stat['camera_info']['stream'][_stream_name]['host']
             _port = int(_stat['camera_info']['stream'][_stream_name]['port'])
             return _host, _port
-
 
         if stream_type in (MotifApi.STREAM_TYPE_IMAGE, MotifApi.STREAM_TYPE_STATE):
             try:
