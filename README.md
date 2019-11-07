@@ -242,7 +242,7 @@ compulsory arguments.
 
 **Camera Relative Schedules**
 
-Please ensure you have read the [full documentation](README.cronex.md) on cron triggers first. Often one needs to schedule events not in the conventional cron sense - relative to the date and time of the day, but instead wants to schedule operations relative to when a recording was started. If a task is scheduled with `camera_relative=True` then dates are interpreted differently. For example the expression
+Please ensure you have read the [full documentation](README.cron.md) on cron triggers first. Often one needs to schedule events not in the conventional cron sense - relative to the date and time of the day, but instead wants to schedule operations relative to when a recording was started. If a task is scheduled with `camera_relative=True` then dates are interpreted differently. For example the expression
 
  * `0 5 * ? * * *`
     * with `camera_relative=False` means execute the task *at second :00 of minute :05 of every hour*
