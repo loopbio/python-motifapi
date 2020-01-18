@@ -1,3 +1,4 @@
+import sys
 import json
 import threading
 
@@ -5,9 +6,15 @@ import zmq
 import numpy as np
 
 
+if sys.version_info > (3,):
+    buffer = memoryview
+
+
 def recv_array(socket, flags=0, copy=True, track=False):
     md = socket.recv_json(flags=flags)
     msg = socket.recv(flags=flags, copy=copy, track=track)
+    # note: I don't actually think this is necessary, in PY2 this is type<str> and np.frombuffer(str) does
+    # the right thing, in PY3 this is type<bytes> which supports buffer protocol
     buf = buffer(msg)
     A = np.frombuffer(buf, dtype=md.pop('dtype'))
     return A.reshape(md.pop('shape')), md
@@ -24,10 +31,10 @@ class ImageStreamer(object):
         sock.bind(address)
         self.stream = sock
 
-    def get_next_image(self, block=True):
+    def get_next_image(self, block=True, copy=True):
         while True:
             while self.stream.poll(0, zmq.POLLIN):
-                return recv_array(self.stream)
+                return recv_array(self.stream, copy=copy)
             if not block:
                 return None, None
 
@@ -40,7 +47,10 @@ class StateStreamer(object):
         sock = ctx.socket(zmq.SUB)
         sock.connect(address)
         sock.setsockopt(zmq.LINGER, 0)
-        sock.setsockopt(zmq.SUBSCRIBE, channel)
+        if sys.version_info > (3,):
+            sock.setsockopt_string(zmq.SUBSCRIBE, channel)
+        else:
+            sock.setsockopt(zmq.SUBSCRIBE, channel)
         self.stream = sock
 
     def get_next_state(self, block=True):
