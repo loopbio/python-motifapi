@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import threading
 import time
 import cv2
@@ -13,7 +15,7 @@ class LatestImage(threading.Thread):
     def __init__(self, api):
         super(LatestImage, self).__init__()
 
-        self._img = self._ts = None
+        self._img = self._md = None
         self._lock = threading.Lock()
 
         self._stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_IMAGE)
@@ -21,20 +23,19 @@ class LatestImage(threading.Thread):
 
     def run(self):
         while True:
-            I, md = self._stream.get_next_image()
+            I, md = self._stream.get_next_image(copy=False)
             with self._lock:
                 self._img = I.copy()
-                self._ts = md['timestamp']
+                self._md = md.copy()
 
     @property
     def latest_image(self):
         with self._lock:
             if self._img is not None:
-                print time.time() - self._ts
-                return self._img.copy()
+                return self._img, self._md
 
 
-def slow_thing(I):
+def slow_thing(I, md):
     time.sleep(0.1)
     cv2.imshow('live', I)
     cv2.waitKey(1)
@@ -48,8 +49,8 @@ if __name__ == "__main__":
     poller.start()
 
     while True:
-        I = poller.latest_image
-        if I is not None:
-            slow_thing(I)
+        latest = poller.latest_image
+        if latest is not None:
+            slow_thing(*latest)
 
 
