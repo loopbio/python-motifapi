@@ -115,6 +115,8 @@ class MotifApi(object):
            'camera/(?P<serial>[^\s /]+)/recordings/copy_all$': 'POST',
            'camera/(?P<serial>[^\s /]+)/recordings/export_all$': 'POST',
            'camera/(?P<serial>[^\s /]+)/io/(?P<name>[^\s /]+)/set': 'POST',
+           'camera/(?P<serial>[^\s /]+)/io/log': 'POST',
+           'camera/(?P<serial>[^\s /]+)/io/read': 'GET',
            'recording/start$': 'POST',
            'recording/stop$': 'POST',
            'recordings$': 'GET',
@@ -135,6 +137,8 @@ class MotifApi(object):
            'schedule/camera/(?P<serial>[^\s /]+)/configure/(?P<name>[^\s /]+)': 'POST',
            'io/(?P<io_serial>[^\s /]+)/(?P<io_port>[^\s /]+)/set': 'POST',
            'io/(?P<name>[^\s /]+)/set': 'POST',
+           'io/log': 'POST',
+           'io/read': 'GET',
            }
 
     def __init__(self, host=None, api_key=None, port=6083, ca_cert=None, api_version=1):
