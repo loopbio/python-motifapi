@@ -278,7 +278,7 @@ class MotifApi(object):
         status = r['playback_info']['status']
         return status.startswith('export') and ('finished' not in status)
 
-    def get_stream(self, serial=None, stream_type=STREAM_TYPE_IMAGE):
+    def get_stream(self, serial=None, stream_type=STREAM_TYPE_IMAGE, force_host=None):
         from .stream import ImageStreamer, StateStreamer
 
         if serial is None:
@@ -297,6 +297,12 @@ class MotifApi(object):
             _stat = self.call('camera/%s' % serial)
             _host = _stat['camera_info']['stream'][_stream_name]['host']
             _port = int(_stat['camera_info']['stream'][_stream_name]['port'])
+
+            if force_host is not None:
+                _host = force_host
+            elif (_host == '0.0.0.0') and (self._host != '0.0.0.0'):
+                _host = self._host
+
             return _host, _port
 
         if stream_type in (MotifApi.STREAM_TYPE_IMAGE, MotifApi.STREAM_TYPE_STATE):
