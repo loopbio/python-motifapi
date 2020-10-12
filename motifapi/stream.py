@@ -1,6 +1,7 @@
 import sys
 import json
 import threading
+import logging
 
 import zmq
 import numpy as np
@@ -8,6 +9,9 @@ import numpy as np
 
 if sys.version_info > (3,):
     buffer = memoryview
+
+
+LOG = logging.getLogger('motifapi.stream')
 
 
 def recv_array(socket, flags=0, copy=True, track=False):
@@ -27,8 +31,9 @@ class ImageStreamer(object):
     def __init__(self, host, port):
         ctx = zmq.Context()
         address = "tcp://%s:%d" % (host, port)
+        LOG.debug('image stream connecting to: %s' % address)
         sock = ctx.socket(zmq.PULL)
-        sock.bind(address)
+        sock.connect(address)
         self.stream = sock
 
     def get_next_image(self, block=True, copy=True):
@@ -44,6 +49,7 @@ class StateStreamer(object):
     def __init__(self, host, port, channel='j'):
         ctx = zmq.Context()
         address = "tcp://%s:%d" % (host, port)
+        LOG.debug('state stream connecting to: %s' % address)
         sock = ctx.socket(zmq.SUB)
         sock.connect(address)
         sock.setsockopt(zmq.LINGER, 0)
