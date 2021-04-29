@@ -141,13 +141,16 @@ class MotifApi(object):
            'io/read': 'GET',
            }
 
-    def __init__(self, host=None, api_key=None, port=6083, ca_cert=None, api_version=1):
+    def __init__(self, host=None, api_key=None, port=None, ca_cert=None, api_version=1):
         self._log = logging.getLogger('motifapi')
 
-        try:
-            port = int(os.environ.get('MOTIF_PORT', port))
-        except:
-            pass
+        if port is None:
+            try:
+                port = int(os.environ.get('MOTIF_PORT', 6083))
+            except:
+                port = 6083
+        else:
+            port = int(port)
 
         if host is None:
             try:
