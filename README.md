@@ -5,7 +5,7 @@ This library allows you to control cameras and recording on loopbio [motif](http
 recording systems, including the ability to control outputs and schedule operations. This allows
 you to implement experimental or operational protocols like;
 
- * "start recording every hour for 30 minues. while recording give this stimulus (switch this output)
+ * "start recording every hour for 30 minutes. while recording give this stimulus (switch this output)
     every 5 minutes"
  * "record at 9am and 3pm. at 5pm copy all recorded videos to network storage"
  * "while recording, at minute 1 switch this output on, then every 30 seconds thereafter, switch on and
@@ -18,23 +18,24 @@ you to implement experimental or operational protocols like;
  * [API Documentation](#api-documentation)
  * [Scheduling](#scheduling-function)
  * [API Documentation (Scheduling)](#scheduling-api-documentation)
- * [Realtime Streaming](#realtime-streaming)
  * [MATLAB](#matlab) and [Other Language](#other-languages) support
+ * [Realtime Streaming](#realtime-streaming)
 
 ## Getting Started
 
 * this library works out of the box on Python2 and Python3 and has no dependencies outside
   of the standard library
-* to control a motif recording system you need to know it's IP address and an API key.
-  * the IP address is that which you browse to inorder to control the recording software
+* this library wraps the REST+JSON API and handles sending and parsing the responses
+* this library is compatible with all motif versions, although real-time image streaming and
+  some IO operations are only supported in motif 5 and above
+* to control a motif recording system you need to know it's `IP_ADDRESS` and an `API_KEY`.
+  * the IP address is that which you browse to in order to control the recording software
     using your web browser
   * the API key is specific to the installation of the recording software and secures the
     API from unauthorized access. To find the API key for the recording system you wish to
     control, SSH into the machine (or request your sysadmin to) and execute the following
     command `recnode-apikey`
-* this library wraps the REST+JSON API and handles sending and parsing the responses
-* this library is compatible with all motif versions, although real-time image streaming and
-  some IO operations are only supported in motif 5 and above
+
 
 ### Examples
 
@@ -115,6 +116,12 @@ with the appropriate values. Arguments are passed after the path, e.g.
         * `...` or any other camera supported parameter name and value
  * `cameras/configure`
     * as previous, but apply the configuration changes to every attached camera
+ * `camera/<serial>/read/<parameter_name>`
+    * change camera configuration
+    * `serial`: the serial number of the camera
+    * `parameter_name`: the name of a camera parameter, like that passed to `/configure`, e.g. `AcquisitionFrameRate`
+ * `cameras/read/<parameter_name>`
+    * as previous, but return values for all cameras
  * `camera/<serial>/recording/start`
     * start recording on the selected camera
     * `serial`: the serial number of the camera
@@ -174,7 +181,7 @@ with the appropriate values. Arguments are passed after the path, e.g.
     * arguments
         * `value`: the value to set on the output (backend dependent)
  * `io/<name>/set`
-    * set named ouput to the provided value. in index or master mode in
+    * set named output to the provided value. in index or master mode in
       a multiple camera setup, the named output channel must be on a
       output device attached to the master or index node.
       setup (or to the only attached camera in a single camera setup) 
@@ -188,6 +195,8 @@ with the appropriate values. Arguments are passed after the path, e.g.
     * arguments
         * `value`: continuous value to set OR
         * `state`: 0 or 1 to turn on or off
+ * `io/log`
+    * send multiple arguements to be recorded in the imgstore extra_data - in addition to the current frame_number and time of the log message
 
 **Outputs and Toggling Values**
 
@@ -234,7 +243,7 @@ compulsory arguments.
 
 **Scheduling specific arguments**
 
-   * `task_name` (required): A unique shor identifier for this task
+   * `task_name` (required): A unique short identifier for this task
    * `cron_expression` (required): a cron specifier conforming to the cron syntax above
    * `camera_relative` (optional, Motif 5 and above only)
       * `True`: if true all absolute and relative dates are relative to the start of the recording
@@ -310,7 +319,7 @@ With monotonic triggers `7%7` or `%10` this can be confusing. Monotonic triggers
         * scheduling specific (above)
         * `value` (required): the new value of the parameter
  * `schedule/io/<name>/set`
-    * schedule the setting of the named ouput to the provided value.
+    * schedule the setting of the named output to the provided value.
       in index or master mode in a multiple camera setup, the named output
       channel must be on a output device attached to the master or index node.
     * arguments
@@ -339,8 +348,8 @@ camera_serial = '123456'
 io_name = 'led'
 
 # note the use of datetime_to_cron() which converts an absolute date/time to a non-repeating
-# non-monotonic cron expression. Furthermore, note that because this should occure 17s relative
-# to the start of recording, we pass a datetime initilized from 0 seconds.
+# non-monotonic cron expression. Furthermore, note that because this should occur 17s relative
+# to the start of recording, we pass a datetime initialized from 0 seconds.
 
 api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
          task_name='led_on_after_17s',
@@ -349,7 +358,7 @@ api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
          value=1.0)
 ```
 
-monotonic expressions do not require the use of `datetime_to_cron` as the repeat regardles. For example the following expression flashes / toggles an LED every second
+monotonic expressions do not require the use of `datetime_to_cron` as the repeat regardless. For example the following expression flashes / toggles an LED every second
 
 ```python
 api.call('schedule/camera/%s/io/%s/set' % (camera_serial, io_name),
@@ -406,53 +415,12 @@ api.call('schedule/recording/start',
 
 **See examples/scheduler.py for more information**
 
-<!---motifcutstart--->
-
-## Realtime Streaming
-
-Motif can, with very low latency (&lt;1ms), stream realtime images from the camera, without interfering with
-the recording, compression, or any other motif functions. This allows developing *out of process* realtime
-image processing algorithms for closed loop experiments. Such experiments could for example then provide
-stimulus to the animal using either Motif connected and configured outputs, or other user provided methods.
-
-Per default streaming is limited to localhost (so such scripts must run on the same PC as Motif), however
-Motif can be configured to stream also to other network locations if you are aware of the latency
-implications and have sufficient network infrastructure.
-
-### Streaming Images
-
-A realtime image stream can be established as follows (after constructing the `api` object with the correct IP address and API_KEY as indicated above
-
-```python
-# small example using opencv to show the image in realtime, outside of motif
-
-stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_IMAGE)
-if stream is not None:
-    while True:
-        I, md = stream.get_next_image()
-        cv2.imshow('live', I)
-        cv2.waitKey(1)
-```
-
-### Streaming State
-
-If you have other more custom data acquisition needs not supported by Motif IO / DAQ support, and want to subsequently 
-integrate or synchronize this custom data with the motif imagestore `frame_number`s and `frame_time`s then you can use the realtime state streaming. Motif publishes to this stream, at low latency (&lt;&lt;1ms), the current `frame_number`, `frame_time`, and other information. A realtime state stream is established as follows
-
-```python
-stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_STATE)
-if stream is not None:
-    while True:
-        print stream.get_next_state()
-```
-
-<!---motifcutend--->
 
 ## Other Languages
 
 The API is a pure REST api, which means any language / framework / environment with support for calling REST+JSON endpoints and handling their responses is supported.
 
-Note: You must provide the HTTPS server certificate and authenticaion API key in a manner appropriate for your language / framework / environment.
+Note: You must provide the HTTPS server certificate and authentication API key in a manner appropriate for your language / framework / environment.
 
 ### MATLAB
 
@@ -461,7 +429,7 @@ Because the Motif API is pure HTTP+JSON you can also use MATLAB to control the r
 * Examples below are for the hypothetical IP address `10.11.12.13` and API_KEY `abcdef123456abcdef123456abcdef12`. Please replace with values appropriate to your system
   * On windows, you can find the API key in the config file (link in Start menu), on Linux by executing `recnode-apikey` on the PC
 * `server.crt` must be the full path to the `server.crt` file which you should [download](https://raw.githubusercontent.com/loopbio/python-motifapi/master/motifapi/server.crt) from this repository. 
-* Not all endpoints are `POST`, although most are. `GET` endpoints are read using `webread`, `POST`, `PATCH`, `DELETE` using `webwrite`. The endpoint type is documented in [api.py](motifapi/api.py).
+* Not all endpoints are `POST`, although most are. `GET` endpoints are read using `webread`, `POST`, `PATCH`, `DELETE` using `webwrite`. The endpoint type is documented in [api.py](http://github.com/loopbio/python-motifapi/blob/master/motifapi/api.py).
 
 **Checking Status**
 
@@ -503,3 +471,86 @@ o = weboptions('CertificateFilename', 'server.crt', ...
 arguments = struct('codec','h264');
 webwrite('https://10.11.12.13:6083/api/1/recording/stop',arguments,o)
 ```
+
+**Checking Status**
+
+```matlab
+% example showing how to list connected cameras from MATLAB
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'})
+# list the connected cameras
+webread('https://10.11.12.13:6083/api/1/cameras', o)
+```
+
+**Turning on an Output**
+
+```matlab
+% example showing how to set an output using a POST request
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
+               'MediaType', 'application/json')
+arguments = struct('value',0.3);
+webwrite('https://10.11.12.13:6083/api/1/io/led/set',arguments,o)
+```
+
+**Starting Recording**
+
+```matlab
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
+               'MediaType', 'application/json')
+arguments = struct('codec','h264');
+webwrite('https://10.11.12.13:6083/api/1/recording/start',arguments,o)
+```
+
+**Stopping Recording**
+
+```matlab
+o = weboptions('CertificateFilename', 'server.crt', ...
+               'HeaderFields', {'X-Api-Key', 'abcdef123456abcdef123456abcdef12'}, ...
+               'MediaType', 'application/json')
+arguments = struct('codec','h264');
+webwrite('https://10.11.12.13:6083/api/1/recording/stop',arguments,o)
+```
+
+<!---motifcutstart--->
+
+## Realtime Streaming
+
+Motif can, with very low latency (&lt;1ms), stream realtime images from the camera, without interfering with
+the recording, compression, or any other motif functions. This allows developing *out of process* realtime
+image processing algorithms for closed loop experiments. Such experiments could for example then provide
+stimulus to the animal using either Motif connected and configured outputs, or other user provided methods.
+
+Per default streaming is limited to localhost (so such scripts must run on the same PC as Motif), however
+Motif can be configured to stream also to other network locations if you are aware of the latency
+implications and have sufficient network infrastructure.
+
+### Streaming Images
+
+A realtime image stream can be established as follows (after constructing the `api` object with the correct IP address and API_KEY as indicated above
+
+```python
+# small example using opencv to show the image in realtime, outside of motif
+
+stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_IMAGE)
+if stream is not None:
+    while True:
+        I, md = stream.get_next_image()
+        cv2.imshow('live', I)
+        cv2.waitKey(1)
+```
+
+### Streaming State
+
+If you have other more custom data acquisition needs not supported by Motif IO / DAQ support, and want to subsequently 
+integrate or synchronize this custom data with the motif imagestore `frame_number`s and `frame_time`s then you can use the realtime state streaming. Motif publishes to this stream, at low latency (&lt;&lt;1ms), the current `frame_number`, `frame_time`, and other information. A realtime state stream is established as follows
+
+```python
+stream = api.get_stream(stream_type=MotifApi.STREAM_TYPE_STATE)
+if stream is not None:
+    while True:
+        print stream.get_next_state()
+```
+
+<!---motifcutend--->
