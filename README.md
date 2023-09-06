@@ -1,9 +1,10 @@
 API for Motif Recording Systems (Python Wrapper)
 ================================================
 
-This library allows you to control cameras and recording on loopbio [motif](http://loopbio.com/recording)
-recording systems, including the ability to control outputs and schedule operations. This allows
-you to implement experimental or operational protocols like;
+[This library](https://github.com/loopbio/python-motifapi) allows you to control cameras
+and recording on loopbio [motif](http://loopbio.com/recording) recording systems, including
+the ability to control outputs and schedule operations. This allows you to implement
+experimental or operational protocols like;
 
  * "start recording every hour for 30 minutes. while recording give this stimulus (switch this output)
     every 5 minutes"
@@ -197,6 +198,17 @@ with the appropriate values. Arguments are passed after the path, e.g.
         * `state`: 0 or 1 to turn on or off
  * `io/log`
     * send multiple arguements to be recorded in the imgstore extra_data - in addition to the current frame_number and time of the log message
+ * `multicam/synchronize`
+   * synchronize the cameras (in a multiple camera setup)
+ * `multicam/connect_camera/<serial>`
+   * start the camera process for the camera with the provided serial
+   * `serial`: the serial number of the camera.
+     * passing the special value `__all` here connects all cameras
+ * `multicam/disconnect_camera/<serial>`
+   * stops the camera process for the camera with the provided serial
+   * `serial`: the serial number of the camera.
+     * passing the special value `__all` here disconnects all cameras
+
 
 **Outputs and Toggling Values**
 
