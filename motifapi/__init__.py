@@ -1,4 +1,4 @@
-__version__ = '0.1.9'
+__version__ = '0.1.10'
 
 from .api import MotifError, MotifApiError, MotifApi
 from .schedule import datetime_to_cron
