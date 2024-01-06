@@ -139,6 +139,11 @@ class MotifApi(object):
            'io/(?P<name>[^\s /]+)/set': 'POST',
            'io/log': 'POST',
            'io/read': 'GET',
+           'multicam/synchronize': 'POST',
+           'multicam/connect_camera/(?P<serial>[^\s /]+)': 'POST',
+           'multicam/disconnect_camera/(?P<serial>[^\s /]+)': 'POST',
+           'multicam/connect_all': 'POST',
+           'multicam/disconnect_all': 'POST',
            }
 
     def __init__(self, host=None, api_key=None, port=None, ca_cert=None, api_version=1):
