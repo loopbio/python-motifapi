@@ -6,26 +6,6 @@ on:
     - 'v*'
 
 jobs:
-  build-pypi:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python3.10 -m pip install --upgrade pip
-        python3.10 -m pip install setuptools wheel
-    - name: Build
-      run: |
-        python3.10 setup.py sdist bdist_wheel
-    - name: Publish distribution to PyPI
-      if: startsWith(github.event.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.pypi_password }}
   build-debs:
     runs-on: ubuntu-22.04
     steps:
