@@ -199,15 +199,15 @@ with the appropriate values. Arguments are passed after the path, e.g.
  * `io/log`
     * send multiple arguements to be recorded in the imgstore extra_data - in addition to the current frame_number and time of the log message
  * `multicam/synchronize`
-   * synchronize the cameras (in a multiple camera setup)
+    * synchronize the cameras (in a multiple camera setup)
  * `multicam/connect_camera/<serial>`
-   * start the camera process for the camera with the provided serial
-   * `serial`: the serial number of the camera.
-     * passing the special value `__all` here connects all cameras
+    * start the camera process for the camera with the provided serial
+    * `serial`: the serial number of the camera.
+        * passing the special value `__all` here connects all cameras
  * `multicam/disconnect_camera/<serial>`
-   * stops the camera process for the camera with the provided serial
-   * `serial`: the serial number of the camera.
-     * passing the special value `__all` here disconnects all cameras
+    * stops the camera process for the camera with the provided serial
+    * `serial`: the serial number of the camera.
+        * passing the special value `__all` here disconnects all cameras
 
 
 **Outputs and Toggling Values**
