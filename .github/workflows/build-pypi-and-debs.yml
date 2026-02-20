@@ -6,6 +6,24 @@ on:
     - 'v*'
 
 jobs:
+  build-pypi:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+    - name: Install build
+      run: python3 -m pip install --user build
+    - name: Build
+      run: python3 -m build
+    - name: Publish distribution to PyPI
+      if: startsWith(github.event.ref, 'refs/tags')
+      uses: pypa/gh-action-pypi-publish@release/v1
+
   build-debs-2404:
     if: startsWith(github.ref, 'refs/tags/v0.2')
     runs-on: ubuntu-24.04
