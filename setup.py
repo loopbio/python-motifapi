@@ -7,7 +7,7 @@ setup(
     license='BSD',
     description='Python interface to Motif recording systems',
     long_description='Python interface to Motif recording systems',
-    version='0.2.00',
+    version='0.2.0',
     author='John Stowers',
     author_email='john@loopbio.com',
     packages=['motifapi'],
