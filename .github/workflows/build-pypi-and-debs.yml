@@ -6,10 +6,30 @@ on:
     - 'v*'
 
 jobs:
-  build-debs:
+  build-debs-2404:
+    if: startsWith(github.ref, 'refs/tags/v0.2')
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install system dependencies
+      run: sudo apt-get install ruby ruby-rubygems
+    - name: Install FPM
+      run: gem install --user-install --no-document fpm -v 1.17.0
+    - name: Build debs
+      run: make -f Makefile.2404 FPM=$HOME/.local/share/gem/ruby/3.2.0/bin/fpm clean deb
+    - name: MD5SUM debs
+      run: md5sum *.deb > MD5SUM
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "*.deb"
+        bodyFile: "MD5SUM"
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-debs-2204:
+    if: startsWith(github.ref, 'refs/tags/v0.1')
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Install system dependencies
       run: sudo apt-get install ruby ruby-rubygems
     - name: Install FPM
