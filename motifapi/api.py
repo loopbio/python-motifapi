@@ -1,4 +1,3 @@
-from __future__ import print_function
 import re
 import json
 import ssl
@@ -6,8 +5,9 @@ import socket
 import os.path
 import subprocess
 import logging
-
-from six.moves import urllib, http_client
+import urllib.request
+import urllib.error
+import http.client
 
 DEFAULT_HTTP_TIMEOUT = 10  # seconds
 
@@ -18,44 +18,36 @@ DEFAULT_HTTP_TIMEOUT = 10  # seconds
 class HTTPSClientAuthHandler(urllib.request.HTTPSHandler):
     """
     Allows sending a client certificate with the HTTPS connection.
-    This version also validates the peer (server) certificate since, well...
+    This version also validates the peer (server) certificate.
     """
 
-    def __init__(self, key=None, cert=None, ca_certs=None, ssl_version=None):
-        urllib.request.HTTPSHandler.__init__(self)
-        self.key = key
-        self.cert = cert
-        self.ca_certs = ca_certs
-        self.ssl_version = ssl_version
+    def __init__(self, key=None, cert=None, ca_certs=None):
+        self.ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        self.ctx.check_hostname = False
+        if ca_certs:
+            self.ctx.verify_mode = ssl.CERT_REQUIRED
+            self.ctx.load_verify_locations(ca_certs)
+        else:
+            self.ctx.verify_mode = ssl.CERT_NONE
+        if cert:
+            self.ctx.load_cert_chain(cert, key)
+        urllib.request.HTTPSHandler.__init__(self, context=self.ctx)
 
     def https_open(self, req):
-        # Rather than pass in a reference to a connection class, we pass in
-        # a reference to a function which, for all intents and purposes,
-        # will behave as a constructor
         return self.do_open(self.get_connection, req)
 
     def get_connection(self, host, timeout=DEFAULT_HTTP_TIMEOUT):
-        return HTTPSConnection(host,
-                               key_file=self.key,
-                               cert_file=self.cert,
-                               timeout=timeout,
-                               ca_certs=self.ca_certs,
-                               ssl_version=self.ssl_version)
+        return HTTPSConnection(host, timeout=timeout, context=self.ctx)
 
 
-class HTTPSConnection(http_client.HTTPSConnection):
+class HTTPSConnection(http.client.HTTPSConnection):
     """
-    Overridden to allow peer certificate validation, configuration
-    of SSL/ TLS version.  See:
-    http://hg.python.org/cpython/file/c1c45755397b/Lib/httplib.py#l1144
-    and `ssl.wrap_socket()`
+    Overridden to allow peer certificate validation using an SSLContext.
     """
 
     def __init__(self, host, **kwargs):
-        self.ca_certs = kwargs.pop('ca_certs', None)
-        self.ssl_version = kwargs.pop('ssl_version', ssl.PROTOCOL_SSLv23)
-
-        http_client.HTTPSConnection.__init__(self, host, **kwargs)
+        self.ctx = kwargs.pop('context', None)
+        http.client.HTTPSConnection.__init__(self, host, **kwargs)
 
     def connect(self):
         sock = socket.create_connection((self.host, self.port), self.timeout)
@@ -64,12 +56,10 @@ class HTTPSConnection(http_client.HTTPSConnection):
             self.sock = sock
             self._tunnel()
 
-        self.sock = ssl.wrap_socket(sock,
-                                    keyfile=self.key_file,
-                                    certfile=self.cert_file,
-                                    ca_certs=self.ca_certs,
-                                    cert_reqs=ssl.CERT_REQUIRED if self.ca_certs else ssl.CERT_NONE,
-                                    ssl_version=self.ssl_version)
+        if self.ctx:
+            self.sock = self.ctx.wrap_socket(sock, server_hostname=self.host)
+        else:
+            self.sock = sock
 
 
 class MethodRequest(urllib.request.Request):
@@ -195,8 +185,7 @@ class MotifApi(object):
         handler = HTTPSClientAuthHandler(
             key=client_cert_key,
             cert=client_cert_pem,
-            ca_certs=ca_cert,
-            ssl_version=ssl.PROTOCOL_SSLv23)
+            ca_certs=ca_cert)
         self._http = urllib.request.build_opener(handler)
 
         self._host = host
