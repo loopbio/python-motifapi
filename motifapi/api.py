@@ -129,6 +129,8 @@ class MotifApi(object):
            r'io/(?P<name>[^\s /]+)/set': 'POST',
            r'io/log': 'POST',
            r'io/read': 'GET',
+           r'camera/(?P<serial>[^\s /]+)/experiment/message$': 'POST',
+           r'experiment/message$': 'POST',
            r'multicam/synchronize': 'POST',
            r'multicam/connect_camera/(?P<serial>[^\s /]+)': 'POST',
            r'multicam/disconnect_camera/(?P<serial>[^\s /]+)': 'POST',
@@ -274,6 +276,11 @@ class MotifApi(object):
         r = self.call('camera/%s' % serial)
         status = r['playback_info']['status']
         return status.startswith('export') and ('finished' not in status)
+
+    def send_message(self, message, serial=None):
+        if serial:
+            return self.call('camera/%s/experiment/message' % serial, message=message)
+        return self.call('experiment/message', message=message)
 
     def get_stream(self, serial=None, stream_type=STREAM_TYPE_IMAGE, force_host=None):
         from .stream import ImageStreamer, StateStreamer

@@ -17,6 +17,7 @@ experimental or operational protocols like;
  * [Examples](#examples)
  * [Examples (IO and Scheduling)](#scheduling-examples)
  * [API Documentation](#api-documentation)
+ * [Experiment Script Messages](#experiment-script-messages)
  * [Scheduling](#scheduling-function)
  * [API Documentation (Scheduling)](#scheduling-api-documentation)
  * [MATLAB](#matlab) and [Other Language](#other-languages) support
@@ -198,6 +199,15 @@ with the appropriate values. Arguments are passed after the path, e.g.
         * `state`: 0 or 1 to turn on or off
  * `io/log`
     * send multiple arguements to be recorded in the imgstore extra_data - in addition to the current frame_number and time of the log message
+ * `camera/<serial>/experiment/message`
+    * send a user-facing status message from an experiment script to the web UI
+      for the specified camera
+    * `serial`: the serial number of the camera
+    * arguments
+        * `message`: the text to display. pass an empty string to clear the message
+ * `experiment/message`
+    * as previous, but in a single camera setup or to target the multicam
+      master/index UI
  * `multicam/synchronize`
     * synchronize the cameras (in a multiple camera setup)
  * `multicam/connect_camera/<serial>`
@@ -216,6 +226,38 @@ There exists a special value for (digital) outputs that results in the output st
 toggled (alternating) between minimum and maximum values. If you pass `value=+inf` then this means
 start with a switch to maximum, then toggle between minimum and maximum subsequently. `value=-inf`
 start with a switch to minimum, then toggle between maximum and minimum subsequently.
+
+## Experiment Script Messages
+
+Experiment scripts can send a short text message back to the Motif web UI using the
+`send_message` convenience method (or the `experiment/message` endpoint). The message
+appears in the Experiment Scripts section of the UI with a timestamp, and can be updated
+at any time to show progress or status.
+
+```python
+from motifapi import MotifApi
+
+api = MotifApi(IP_ADDRESS, API_KEY)
+
+# send a message (appears in the multicam or single-cam UI)
+api.send_message('Starting trial 1')
+
+# send a message targeting a specific camera
+api.send_message('Acquiring baseline', serial='FAKE0')
+
+# clear the message
+api.send_message('')
+```
+
+Using `api.call` directly:
+
+```python
+# to the multicam / single-cam UI
+api.call('experiment/message', message='Hello from script')
+
+# to a specific camera's UI
+api.call('camera/FAKE0/experiment/message', message='Running phase 2')
+```
 
 ## Scheduling Function
 
