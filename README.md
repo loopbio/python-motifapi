@@ -137,11 +137,14 @@ with the appropriate values. Arguments are passed after the path, e.g.
         * `duration` (optional): number of seconds to record for, or indefinately if omitted
         * `metadata` (optional): a dictionary of metadata to save in the resulting video
         * `codec_identifier` (optional): advanced use only
+        * `force` (optional): if true, skip automatic synchronization before recording
  * `recording/start`
     * as previous, but start recording on all cameras
  * `camera/<serial>/recording/stop`
     * stop recording on the selected camera
     * `serial`: the serial number of the camera
+    * arguments
+        * `force` (optional): if true, stop recording even when cameras are not synchronized
  * `recording/stop`
     * as previous, but stop recording on all cameras
  * `camera/<serial>/recordings`
