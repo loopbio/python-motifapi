@@ -14,7 +14,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/loopbio/python-motifapi',
-    version='0.2.0',
+    version='0.2.1',
     author='John Stowers',
     author_email='john@loopbio.com',
     packages=['motifapi'],
