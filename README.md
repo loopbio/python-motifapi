@@ -14,6 +14,7 @@ experimental or operational protocols like;
 
 **Table of Contents**
 
+ * [Installation](#installation)
  * [Examples](#examples)
  * [Examples (IO and Scheduling)](#scheduling-examples)
  * [API Documentation](#api-documentation)
@@ -22,6 +23,17 @@ experimental or operational protocols like;
  * [API Documentation (Scheduling)](#scheduling-api-documentation)
  * [MATLAB](#matlab) and [Other Language](#other-languages) support
  * [Realtime Streaming](#realtime-streaming)
+
+## Installation
+
+Install from [PyPI](https://pypi.org/project/motifapi/)
+
+```bash
+pip install motifapi
+```
+
+or on Ubuntu, install the `python3-motifapi` deb package attached to the
+[GitHub releases](https://github.com/loopbio/python-motifapi/releases).
 
 ## Getting Started
 

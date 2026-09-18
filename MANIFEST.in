@@ -1,1 +1,2 @@
 include motifapi/server.crt
+include README.md
